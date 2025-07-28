@@ -109,9 +109,9 @@ slots.forEach((slot, index) => {
       // Mark slot as filled
       slot.dataset.filled = "true";
 
-      // Remove these lines:
-      // drawnCard.src = 'cards/back.png';
-      // drawnCard.alt = 'Card Back';
+      // Reset drawn card to back image
+      drawnCard.src = 'cards/back.png';
+      drawnCard.alt = 'Card Back';
 
       drawnCardValue = null;
 
@@ -128,4 +128,3 @@ slots.forEach((slot, index) => {
     }
   });
 });
-
