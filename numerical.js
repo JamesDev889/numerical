@@ -109,9 +109,10 @@ slots.forEach((slot, index) => {
       // Mark slot as filled
       slot.dataset.filled = "true";
 
-      // Reset drawn card to back image
-      drawnCard.src = 'cards/back.png';
-      drawnCard.alt = 'Card Back';
+      // Remove these lines:
+      // drawnCard.src = 'cards/back.png';
+      // drawnCard.alt = 'Card Back';
+
       drawnCardValue = null;
 
       // Disable slot so it can't be changed again (extra safety)
