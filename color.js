@@ -1,3 +1,6 @@
+// Test line - remove after debugging
+console.log("JavaScript file loaded successfully!");
+
 // My first JavaScript!
 // Let's make the button interactive
 
