@@ -2,7 +2,7 @@
 // Let's make the button interactive
 
 // Create an array of colors
-const colors = ['white', 'red', 'green', 'blue'];
+const colors = ['white', 'red', 'green', 'blue', 'black'];
 // Initializes an index variable to cycle through the array of colors
 let currentIndex = 0;
 
