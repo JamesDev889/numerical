@@ -23,11 +23,13 @@ let drawCount = 0; // count how many cards drawn
 
 // Helper: Convert card rank to number
 function getCardValue(card) {
+  //creates an array [number, suit] based on the card file names and grabs the number
   const rank = card.split('-')[0];
   if (rank === 'J') return 11;
   if (rank === 'Q') return 12;
   if (rank === 'K') return 13;
   if (rank === 'A') return [1, 14]; // Ace can be 1 or 14
+  //converts string to int
   return parseInt(rank);
 }
 
