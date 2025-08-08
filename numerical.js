@@ -1,3 +1,5 @@
+
+// The deck of cards, one for each suit and rank
 const deck = [
   // Hearts
   '2-H', '3-H', '4-H', '5-H', '6-H', '7-H', '8-H', '9-H', '10-H', 'J-H', 'Q-H', 'K-H', 'A-H',
@@ -9,10 +11,12 @@ const deck = [
   '2-S', '3-S', '4-S', '5-S', '6-S', '7-S', '8-S', '9-S', '10-S', 'J-S', 'Q-S', 'K-S', 'A-S'
 ];
 
+
 const drawButton = document.getElementById('draw-button');
 const drawnCard = document.getElementById('drawn-card');
-
 const newGameButton = document.getElementById('new-game-button');
+
+// Resets the game to its initial state, including the deck, slots, and UI
 newGameButton.addEventListener('click', () => {
   // Reset deck to full
   deck.length = 0;
@@ -58,25 +62,39 @@ newGameButton.addEventListener('click', () => {
   drawButton.disabled = false;
 });
 
-let drawnCardValue = null; // store currently drawn card
-let placedCards = [null, null, null, null, null]; // track cards placed in slots
-let drawCount = 0; // count how many cards drawn
-let totalPoints = 0; // running total points
 
-// Helper: Convert card rank to number
+let drawnCardValue = null; // Stores the currently drawn card
+let placedCards = [null, null, null, null, null]; // Tracks cards placed in slots
+let drawCount = 0; // Counts how many cards have been drawn in the current round
+let totalPoints = 0; // Running total of points (streaks)
+
+
+/**
+ * Converts a card string (e.g., 'A-H', '10-D') to its numeric value.
+ * Returns an array for Ace ([1, 14]) to support both low and high.
+ * @param {string} card
+ * @returns {number|number[]}
+ */
 function getCardValue(card) {
-  //creates an array [number, suit] based on the card file names and grabs the number
   const rank = card.split('-')[0];
   if (rank === 'J') return 11;
   if (rank === 'Q') return 12;
   if (rank === 'K') return 13;
+
   if (rank === 'A') return [1, 14]; // Ace can be 1 or 14
-  //converts string to int
   return parseInt(rank);
 }
 
+
 const message = document.getElementById('message');
 
+
+/**
+ * Given an array of card values (some may be arrays for Ace),
+ * returns all possible value combinations (for Ace as 1 or 14).
+ * @param {Array<number|number[]>} values
+ * @returns {number[][]}
+ */
 function getAllValueCombos(values) {
   let combos = [[]];
   for (const val of values) {
@@ -89,6 +107,11 @@ function getAllValueCombos(values) {
   return combos;
 }
 
+/**
+ * Checks if all placed cards form a valid non-decreasing sequence (with Ace as 1 or 14).
+ * If so, increments streak and resets the board for a new round.
+ * Otherwise, ends the game and displays the final score.
+ */
 function checkForWin() {
   if (placedCards.every(card => card !== null)) {
     const values = placedCards.map(getCardValue);
@@ -100,16 +123,18 @@ function checkForWin() {
       totalPoints++;
       message.textContent = `Current Streak: ${totalPoints}`;
       message.style.color = "white";
-      // Reset the board for a new round, but keep the deck as is
       resetBoardForNextRound();
     } else {
       message.textContent = `Final Score: ${totalPoints}`;
       message.style.color = "white";
-      // Optionally, disable draw button to prevent further play
       drawButton.disabled = true;
     }
   }
-// Reset the slots and state for a new round, but keep the deck and points
+}
+
+/**
+ * Resets the slots and state for a new round, but keeps the deck and points.
+ */
 function resetBoardForNextRound() {
   placedCards = [null, null, null, null, null];
   drawCount = 0;
@@ -128,9 +153,11 @@ function resetBoardForNextRound() {
   // Enable draw button
   drawButton.disabled = false;
 }
-}
 
-// Draw card button click
+
+/**
+ * Handles the draw card button click: draws a random card, updates the UI, and disables the button until placed.
+ */
 drawButton.addEventListener('click', () => {
   if (deck.length === 0) {
     alert("No more cards!");
@@ -138,7 +165,6 @@ drawButton.addEventListener('click', () => {
   }
 
   if (drawCount >= 5) {
-    // Disable draw button if 5 cards already drawn
     drawButton.disabled = true;
     return;
   }
@@ -151,47 +177,32 @@ drawButton.addEventListener('click', () => {
   drawnCard.alt = selectedCard;
   drawnCardValue = selectedCard;
 
-  drawCount++; // increment draw count
-
-  // Disable draw button until card is placed
+  drawCount++;
   drawButton.disabled = true;
-
-  // Also disable permanently if 5 cards drawn now
   if (drawCount === 5) {
     drawButton.disabled = true;
   }
-
   // No check here; only check after 5 cards are placed (see checkForWin)
 });
 
-// Handle slot clicks
-const slots = document.querySelectorAll('.slot');
 
+/**
+ * Handles slot clicks: places the drawn card in the clicked slot, updates state, and checks for win.
+ */
+const slots = document.querySelectorAll('.slot');
 slots.forEach((slot, index) => {
   slot.addEventListener('click', () => {
-    if (drawnCardValue && !slot.dataset.filled) {  // check if slot already filled
+    if (drawnCardValue && !slot.dataset.filled) {
       // Place the drawn card in clicked slot
       slot.src = `cards/${drawnCardValue}.png`;
       slot.alt = drawnCardValue;
-
-      placedCards[index] = drawnCardValue; // track card
-
-      // Mark slot as filled
+      placedCards[index] = drawnCardValue;
       slot.dataset.filled = "true";
-
-      // Reset drawn card to back image
       drawnCard.src = 'cards/back.png';
       drawnCard.alt = 'Card Back';
-
       drawnCardValue = null;
-
-      // Disable slot so it can't be changed again (extra safety)
       slot.style.pointerEvents = 'none';
-
-      // After placing 5 cards, check win condition
       checkForWin();
-
-      // Enable draw button again to draw next card only if less than 5 drawn
       if (drawCount < 5) {
         drawButton.disabled = false;
       }
