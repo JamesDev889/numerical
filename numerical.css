@@ -1,3 +1,13 @@
+html, body {
+  overflow-x: auto;
+  overflow-y: auto;
+  min-height: 100vh;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+  display: none;
+}
 * {
     box-sizing: border-box;
     margin: 0;
