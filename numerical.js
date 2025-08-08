@@ -24,7 +24,7 @@ function shuffleArray(array) {
 
 /**
  * Refill the deck to a full 52-card set and shuffle it.
- * Called on New Game and after each successful round.
+ * Called on first load, New Game, and after each successful round.
  */
 function refillAndShuffleDeck() {
   deck.length = 0;
@@ -40,11 +40,14 @@ function refillAndShuffleDeck() {
   );
   shuffleArray(deck);
 }
+// Shuffle once on initial load to start the first round
+refillAndShuffleDeck();
 
 
 const drawButton = document.getElementById('draw-button');
 const drawnCard = document.getElementById('drawn-card');
 const newGameButton = document.getElementById('new-game-button');
+const highScoreEl = document.getElementById('high-score');
 
 // Resets the game to its initial state, including the deck, slots, and UI
 newGameButton.addEventListener('click', () => {
@@ -60,23 +63,28 @@ newGameButton.addEventListener('click', () => {
   placedCards = [null, null, null, null, null];
   drawCount = 0;
 
-  // Reset total points
+  // Reset total points (streak); keep in-memory high score (resets on reload)
   totalPoints = 0;
+  if (highScoreEl) {
+    highScoreEl.textContent = `High Score: ${highScore}`;
+  }
 
-  // Reset slots
+  // Reset slots to empty numbered rectangles
   const slots = document.querySelectorAll('.slot');
-  slots.forEach(slot => {
-    slot.src = 'cards/back.png';
-    slot.alt = 'Card Back';
+  slots.forEach((slot, i) => {
+    slot.classList.remove('filled');
     slot.dataset.filled = '';
     slot.style.pointerEvents = '';
+    slot.innerHTML = `<span class="slot-number">${i + 1}</span>`;
   });
 
   // Reset message
   if (message) {
-    message.textContent = '';
+    message.textContent = 'Current Streak: 0';
     message.style.color = 'white';
   }
+
+  // No history to clear
 
   // Enable draw button
   drawButton.disabled = false;
@@ -87,6 +95,12 @@ let drawnCardValue = null; // Stores the currently drawn card
 let placedCards = [null, null, null, null, null]; // Tracks cards placed in slots
 let drawCount = 0; // Counts how many cards have been drawn in the current round
 let totalPoints = 0; // Running total of points (streaks)
+let highScore = 0; // In-memory high score that resets on page reload
+
+// Initialize high score display on load
+if (highScoreEl) {
+  highScoreEl.textContent = `High Score: ${highScore}`;
+}
 
 
 /**
@@ -169,6 +183,13 @@ function checkForWin() {
       totalPoints++;
       message.textContent = `Current Streak: ${totalPoints}`;
       message.style.color = "white";
+      // Update high score if needed (in-memory only; resets on reload)
+      if (totalPoints > highScore) {
+        highScore = totalPoints;
+        if (highScoreEl) {
+          highScoreEl.textContent = `High Score: ${highScore}`;
+        }
+      }
       resetBoardForNextRound();
     } else {
       message.textContent = `Final Score: ${totalPoints}`;
@@ -187,13 +208,13 @@ function resetBoardForNextRound() {
   placedCards = [null, null, null, null, null];
   drawCount = 0;
   drawnCardValue = null;
-  // Reset slots
+  // Reset slots to empty numbered rectangles
   const slots = document.querySelectorAll('.slot');
-  slots.forEach(slot => {
-    slot.src = 'cards/back.png';
-    slot.alt = 'Card Back';
+  slots.forEach((slot, i) => {
+    slot.classList.remove('filled');
     slot.dataset.filled = '';
     slot.style.pointerEvents = '';
+    slot.innerHTML = `<span class="slot-number">${i + 1}</span>`;
   });
   // Reset drawn card
   drawnCard.src = 'cards/back.png';
@@ -217,9 +238,8 @@ drawButton.addEventListener('click', () => {
     return;
   }
 
-  const randomIndex = Math.floor(Math.random() * deck.length);
-  const selectedCard = deck[randomIndex];
-  deck.splice(randomIndex, 1); // remove drawn card
+  // Draw the top card from the pre-shuffled deck
+  const selectedCard = deck.pop();
 
   drawnCard.src = `cards/${selectedCard}.png`;
   drawnCard.alt = selectedCard;
@@ -256,8 +276,12 @@ slots.forEach((slot, index) => {
   slot.addEventListener('click', () => {
     if (drawnCardValue && !slot.dataset.filled) {
       // Place the drawn card in clicked slot
-      slot.src = `cards/${drawnCardValue}.png`;
-      slot.alt = drawnCardValue;
+      slot.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = `cards/${drawnCardValue}.png`;
+      img.alt = drawnCardValue;
+      slot.appendChild(img);
+      slot.classList.add('filled');
       placedCards[index] = drawnCardValue;
       slot.dataset.filled = "true";
       drawnCard.src = 'cards/back.png';
