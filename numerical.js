@@ -302,7 +302,7 @@ function checkForWin() {
         });
       }, 1700);
     } else {
-      message.textContent = `Final Score: ${totalPoints}`;
+  message.textContent = `Game Over | Final Score: ${totalPoints}`;
       message.style.color = "white";
       drawButton.disabled = true;
     }
@@ -352,7 +352,7 @@ function drawNewCard() {
   drawnCard.alt = selectedCard;
   drawnCardValue = selectedCard;
   if (!canPlaceCardAnywhere(drawnCardValue)) {
-    message.textContent = `Final Score: ${totalPoints}`;
+  message.textContent = `Game Over | Final Score: ${totalPoints}`;
     message.style.color = 'white';
     // Disable all slots to prevent further interaction
     const allSlots = document.querySelectorAll('.slot');
