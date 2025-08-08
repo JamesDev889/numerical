@@ -1,3 +1,52 @@
+/* Card slot images default size */
+
+/* All card images (slot and drawn) at 50% size */
+
+.slot, #drawn-card {
+  width: 100px;
+  height: auto;
+  transition: width 0.2s, height 0.2s;
+}
+
+.card-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+/* Shrink cards that wrap to a new line (not in the first row) */
+.card-row {
+  position: relative;
+}
+.card-row .slot, .card-row #drawn-card {
+  /* Default size */
+  width: 100px;
+}
+@media (max-width: 600px) {
+  .card-row .slot, .card-row #drawn-card {
+    width: 50px;
+  }
+}
+
+@media (max-width: 600px) {
+  .slot, #drawn-card {
+    width: 50px;
+  }
+}
+
+/* When cards wrap to a new line, reduce their size to 75% */
+.card-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.card-row .slot {
+  flex: 0 0 auto;
+}
+.card-row .slot.wrapped {
+  width: 50px;
+}
 html, body {
   overflow-x: auto !important;
   overflow-y: auto !important;
