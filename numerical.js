@@ -44,7 +44,7 @@ function refillAndShuffleDeck() {
 refillAndShuffleDeck();
 
 
-const drawButton = document.getElementById('draw-button');
+// const drawButton = document.getElementById('draw-button');
 const drawnCard = document.getElementById('drawn-card');
 const newGameButton = document.getElementById('new-game-button');
 const highScoreEl = document.getElementById('high-score');
@@ -87,8 +87,8 @@ newGameButton.addEventListener('click', () => {
       message.style.color = 'white';
     }
 
-    // Enable draw button
-    drawButton.disabled = false;
+  // Draw the first card automatically for new game
+  drawNewCard();
   });
 });
 
@@ -296,7 +296,9 @@ function checkForWin() {
         });
 
         Promise.all(flyPromises).then(() => {
-          resetBoardForNextRound();
+          resetBoardForNextRound(() => {
+            drawNewCard();
+          });
         });
       }, 1700);
     } else {
@@ -310,7 +312,7 @@ function checkForWin() {
 /**
  * Resets the slots and state for a new round, but keeps the deck and points.
  */
-function resetBoardForNextRound() {
+function resetBoardForNextRound(afterReset) {
   // Start each round with a freshly shuffled full deck
   refillAndShuffleDeck();
   placedCards = [null, null, null, null, null];
@@ -328,37 +330,30 @@ function resetBoardForNextRound() {
   drawnCard.src = 'cards/back.png';
   drawnCard.alt = 'Card Back';
   // Enable draw button
-  drawButton.disabled = false;
+  // drawButton.disabled = false;
+  if (typeof afterReset === 'function') afterReset();
 }
 
 
 /**
  * Handles the draw card button click: draws a random card, updates the UI, and disables the button until placed.
  */
-drawButton.addEventListener('click', () => {
+
+function drawNewCard() {
   if (deck.length === 0) {
     alert("No more cards!");
     return;
   }
-
   if (drawCount >= 5) {
-    drawButton.disabled = true;
     return;
   }
-
-  // Draw the top card from the pre-shuffled deck
   const selectedCard = deck.pop();
-
   drawnCard.src = `cards/${selectedCard}.png`;
   drawnCard.alt = selectedCard;
   drawnCardValue = selectedCard;
-
-  // Immediately check if the drawn card can be placed anywhere while keeping
-  // a valid non-decreasing sequence possible. If not, end the game now.
   if (!canPlaceCardAnywhere(drawnCardValue)) {
     message.textContent = `Final Score: ${totalPoints}`;
     message.style.color = 'white';
-    drawButton.disabled = true;
     // Disable all slots to prevent further interaction
     const allSlots = document.querySelectorAll('.slot');
     allSlots.forEach(slot => {
@@ -366,14 +361,8 @@ drawButton.addEventListener('click', () => {
     });
     return;
   }
-
   drawCount++;
-  drawButton.disabled = true;
-  if (drawCount === 5) {
-    drawButton.disabled = true;
-  }
-  // No check here; only check after 5 cards are placed (see checkForWin)
-});
+}
 
 
 /**
@@ -397,8 +386,9 @@ slots.forEach((slot, index) => {
       drawnCardValue = null;
       slot.style.pointerEvents = 'none';
       checkForWin();
+      // Draw a new card automatically unless this is the 5th card
       if (drawCount < 5) {
-        drawButton.disabled = false;
+        drawNewCard();
       }
     }
   });
