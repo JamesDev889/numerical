@@ -1,12 +1,22 @@
 html, body {
-  overflow-x: auto;
-  overflow-y: auto;
+  overflow-x: auto !important;
+  overflow-y: auto !important;
   min-height: 100vh;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
 }
 html::-webkit-scrollbar, body::-webkit-scrollbar {
-  display: none;
+  display: block;
+}
+@media (pointer: coarse) {
+  html, body {
+    /* Show scrollbars on mobile for usability */
+    scrollbar-width: auto;
+    -ms-overflow-style: auto;
+  }
+  html::-webkit-scrollbar, body::-webkit-scrollbar {
+    display: block;
+  }
 }
 * {
     box-sizing: border-box;
