@@ -1,3 +1,16 @@
+#new-game-button,
+#new-game-button:hover,
+#new-game-button.temporarily-disabled,
+#new-game-button.temporarily-disabled:hover {
+  cursor: pointer !important;
+}
+#new-game-button.temporarily-disabled:hover {
+  background: rgb(192, 192, 192);
+}
+#new-game-button.temporarily-disabled:hover {
+  background: rgb(192, 192, 192);
+  cursor: not-allowed;
+}
 #slots-area {
   display: flex;
   flex-direction: row;

@@ -51,9 +51,15 @@ const highScoreEl = document.getElementById('high-score');
 
 // Resets the game to its initial state, including the deck, slots, and UI
 newGameButton.addEventListener('click', () => {
-  // First animate any existing cards back to the deck, then reset/shuffle and clear UI
+  // If button is temporarily disabled, ignore click
+  if (newGameButton.classList.contains('temporarily-disabled')) return;
+  // Disable New Game during shuffle animation and 1s after
+  newGameButton.classList.add('temporarily-disabled');
   const slotsEls = Array.from(document.querySelectorAll('#slots-area .slot'));
   animateCardsBackToDeck(slotsEls).then(() => {
+    setTimeout(() => {
+      newGameButton.classList.remove('temporarily-disabled');
+    }, 1000);
     // Reset and shuffle deck to full
     refillAndShuffleDeck();
 
@@ -87,8 +93,8 @@ newGameButton.addEventListener('click', () => {
       message.style.color = 'white';
     }
 
-  // Draw the first card automatically for new game
-  drawNewCard();
+    // Draw the first card automatically for new game
+    drawNewCard();
   });
 });
 
@@ -244,7 +250,8 @@ function checkForWin() {
           highScoreEl.textContent = `High Score: ${highScore}`;
         }
       }
-      // Trigger wave animation on the five slots twice, then animate cards flying back to deck and reset
+      // Disable New Game during all animations
+      newGameButton.classList.add('temporarily-disabled');
       const slotsEls = Array.from(document.querySelectorAll('#slots-area .slot'));
       slotsEls.forEach((el, idx) => {
         // Stagger via animationDelay
@@ -296,6 +303,9 @@ function checkForWin() {
         });
 
         Promise.all(flyPromises).then(() => {
+          setTimeout(() => {
+            newGameButton.classList.remove('temporarily-disabled');
+          }, 1000);
           resetBoardForNextRound(() => {
             drawNewCard();
           });
