@@ -396,9 +396,11 @@ slots.forEach((slot, index) => {
       drawnCardValue = null;
       slot.style.pointerEvents = 'none';
       checkForWin();
-      // Draw a new card automatically unless this is the 5th card
+      // Draw a new card automatically unless this is the 5th card, with 500ms delay
       if (drawCount < 5) {
-        drawNewCard();
+        setTimeout(() => {
+          drawNewCard();
+        }, 100);
       }
     }
   });
