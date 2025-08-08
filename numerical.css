@@ -263,4 +263,30 @@ body {
     border-radius: 6px;
 }
 
+/* Wave animation for winning row */
+@keyframes waveY {
+    0% { transform: translateY(0); }
+    20% { transform: translateY(-12px); }
+    50% { transform: translateY(0); }
+    80% { transform: translateY(12px); }
+    100% { transform: translateY(0); }
+}
+
+#slots-area .slot.wave {
+    animation: waveY 700ms ease-in-out both;
+    animation-iteration-count: 2;
+}
+
+/* Flying cards animation back to deck */
+.flying-card {
+    position: fixed;
+    width: 120px;
+    height: 168px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 600ms ease, opacity 600ms ease;
+}
+
 /* removed history styling */

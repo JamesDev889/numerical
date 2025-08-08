@@ -51,43 +51,45 @@ const highScoreEl = document.getElementById('high-score');
 
 // Resets the game to its initial state, including the deck, slots, and UI
 newGameButton.addEventListener('click', () => {
-  // Reset and shuffle deck to full
-  refillAndShuffleDeck();
+  // First animate any existing cards back to the deck, then reset/shuffle and clear UI
+  const slotsEls = Array.from(document.querySelectorAll('#slots-area .slot'));
+  animateCardsBackToDeck(slotsEls).then(() => {
+    // Reset and shuffle deck to full
+    refillAndShuffleDeck();
 
-  // Reset drawn card
-  drawnCard.src = 'cards/back.png';
-  drawnCard.alt = 'Card Back';
-  drawnCardValue = null;
+    // Reset drawn card
+    drawnCard.src = 'cards/back.png';
+    drawnCard.alt = 'Card Back';
+    drawnCardValue = null;
 
-  // Reset placed cards and draw count
-  placedCards = [null, null, null, null, null];
-  drawCount = 0;
+    // Reset placed cards and draw count
+    placedCards = [null, null, null, null, null];
+    drawCount = 0;
 
-  // Reset total points (streak); keep in-memory high score (resets on reload)
-  totalPoints = 0;
-  if (highScoreEl) {
-    highScoreEl.textContent = `High Score: ${highScore}`;
-  }
+    // Reset total points (streak); keep in-memory high score (resets on reload)
+    totalPoints = 0;
+    if (highScoreEl) {
+      highScoreEl.textContent = `High Score: ${highScore}`;
+    }
 
-  // Reset slots to empty numbered rectangles
-  const slots = document.querySelectorAll('.slot');
-  slots.forEach((slot, i) => {
-    slot.classList.remove('filled');
-    slot.dataset.filled = '';
-    slot.style.pointerEvents = '';
-    slot.innerHTML = `<span class="slot-number">${i + 1}</span>`;
+    // Reset slots to empty numbered rectangles
+    const slots = document.querySelectorAll('.slot');
+    slots.forEach((slot, i) => {
+      slot.classList.remove('filled');
+      slot.dataset.filled = '';
+      slot.style.pointerEvents = '';
+      slot.innerHTML = `<span class=\"slot-number\">${i + 1}</span>`;
+    });
+
+    // Reset message
+    if (message) {
+      message.textContent = 'Current Streak: 0';
+      message.style.color = 'white';
+    }
+
+    // Enable draw button
+    drawButton.disabled = false;
   });
-
-  // Reset message
-  if (message) {
-    message.textContent = 'Current Streak: 0';
-    message.style.color = 'white';
-  }
-
-  // No history to clear
-
-  // Enable draw button
-  drawButton.disabled = false;
 });
 
 
@@ -122,6 +124,58 @@ function getCardValue(card) {
 
 const message = document.getElementById('message');
 
+
+/**
+ * Animates any card images currently in the provided slots to fly back to the deck (drawn card) position.
+ * Returns a Promise that resolves when all animations complete (including removal of clones).
+ * @param {HTMLElement[]} slotsEls
+ * @returns {Promise<void>}
+ */
+function animateCardsBackToDeck(slotsEls) {
+  return new Promise(resolveOuter => {
+    const deckTarget = drawnCard.getBoundingClientRect();
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+
+    const flyPromises = [];
+
+    slotsEls.forEach(slot => {
+      const img = slot.querySelector('img');
+      if (!img) return; // only animate slots that have a card image
+      const rect = img.getBoundingClientRect();
+      const clone = img.cloneNode(true);
+      clone.classList.add('flying-card');
+      clone.style.left = `${rect.left + scrollX}px`;
+      clone.style.top = `${rect.top + scrollY}px`;
+      clone.style.transform = 'translate(0, 0)';
+      clone.style.opacity = '1';
+      document.body.appendChild(clone);
+
+      // Force reflow then move towards deck
+      // eslint-disable-next-line no-unused-expressions
+      clone.offsetHeight;
+      const dx = deckTarget.left - rect.left;
+      const dy = deckTarget.top - rect.top;
+      requestAnimationFrame(() => {
+        clone.style.transform = `translate(${dx}px, ${dy}px) scale(0.6)`;
+        clone.style.opacity = '0';
+      });
+
+      flyPromises.push(new Promise(resolve => {
+        setTimeout(() => {
+          clone.remove();
+          resolve();
+        }, 650);
+      }));
+    });
+
+    if (flyPromises.length === 0) {
+      resolveOuter();
+      return;
+    }
+    Promise.all(flyPromises).then(() => resolveOuter());
+  });
+}
 
 /**
  * Given an array of card values (some may be arrays for Ace),
@@ -190,7 +244,61 @@ function checkForWin() {
           highScoreEl.textContent = `High Score: ${highScore}`;
         }
       }
-      resetBoardForNextRound();
+      // Trigger wave animation on the five slots twice, then animate cards flying back to deck and reset
+      const slotsEls = Array.from(document.querySelectorAll('#slots-area .slot'));
+      slotsEls.forEach((el, idx) => {
+        // Stagger via animationDelay
+        el.style.animationDelay = `${idx * 80}ms`;
+        el.classList.add('wave');
+      });
+      // After wave completes (2 * 700ms + stagger), clear wave then fly cards
+      setTimeout(() => {
+        slotsEls.forEach(el => {
+          el.classList.remove('wave');
+          el.style.animationDelay = '';
+        });
+
+        // Animate cards flying back to the deck position (drawn card location)
+        const deckTarget = drawnCard.getBoundingClientRect();
+        const containerScrollX = window.scrollX;
+        const containerScrollY = window.scrollY;
+
+        // Create flying clones from each filled slot image
+        const flyPromises = [];
+        slotsEls.forEach(slot => {
+          const img = slot.querySelector('img');
+          if (!img) return;
+          const rect = img.getBoundingClientRect();
+          const clone = img.cloneNode(true);
+          clone.classList.add('flying-card');
+          clone.style.left = `${rect.left + containerScrollX}px`;
+          clone.style.top = `${rect.top + containerScrollY}px`;
+          clone.style.transform = 'translate(0, 0)';
+          clone.style.opacity = '1';
+          document.body.appendChild(clone);
+
+          // Force reflow then move towards deck
+          // eslint-disable-next-line no-unused-expressions
+          clone.offsetHeight;
+          const dx = deckTarget.left - rect.left;
+          const dy = deckTarget.top - rect.top;
+          requestAnimationFrame(() => {
+            clone.style.transform = `translate(${dx}px, ${dy}px) scale(0.6)`;
+            clone.style.opacity = '0';
+          });
+
+          flyPromises.push(new Promise(resolve => {
+            setTimeout(() => {
+              clone.remove();
+              resolve();
+            }, 650);
+          }));
+        });
+
+        Promise.all(flyPromises).then(() => {
+          resetBoardForNextRound();
+        });
+      }, 1700);
     } else {
       message.textContent = `Final Score: ${totalPoints}`;
       message.style.color = "white";
