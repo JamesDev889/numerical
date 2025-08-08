@@ -14,12 +14,54 @@ const drawnCard = document.getElementById('drawn-card');
 
 const newGameButton = document.getElementById('new-game-button');
 newGameButton.addEventListener('click', () => {
-    location.reload();
+  // Reset deck to full
+  deck.length = 0;
+  deck.push(
+    // Hearts
+    '2-H', '3-H', '4-H', '5-H', '6-H', '7-H', '8-H', '9-H', '10-H', 'J-H', 'Q-H', 'K-H', 'A-H',
+    // Diamonds
+    '2-D', '3-D', '4-D', '5-D', '6-D', '7-D', '8-D', '9-D', '10-D', 'J-D', 'Q-D', 'K-D', 'A-D',
+    // Clubs
+    '2-C', '3-C', '4-C', '5-C', '6-C', '7-C', '8-C', '9-C', '10-C', 'J-C', 'Q-C', 'K-C', 'A-C',
+    // Spades
+    '2-S', '3-S', '4-S', '5-S', '6-S', '7-S', '8-S', '9-S', '10-S', 'J-S', 'Q-S', 'K-S', 'A-S'
+  );
+
+  // Reset drawn card
+  drawnCard.src = 'cards/back.png';
+  drawnCard.alt = 'Card Back';
+  drawnCardValue = null;
+
+  // Reset placed cards and draw count
+  placedCards = [null, null, null, null, null];
+  drawCount = 0;
+
+  // Reset total points
+  totalPoints = 0;
+
+  // Reset slots
+  const slots = document.querySelectorAll('.slot');
+  slots.forEach(slot => {
+    slot.src = 'cards/back.png';
+    slot.alt = 'Card Back';
+    slot.dataset.filled = '';
+    slot.style.pointerEvents = '';
+  });
+
+  // Reset message
+  if (message) {
+    message.textContent = '';
+    message.style.color = 'white';
+  }
+
+  // Enable draw button
+  drawButton.disabled = false;
 });
 
 let drawnCardValue = null; // store currently drawn card
 let placedCards = [null, null, null, null, null]; // track cards placed in slots
 let drawCount = 0; // count how many cards drawn
+let totalPoints = 0; // running total points
 
 // Helper: Convert card rank to number
 function getCardValue(card) {
@@ -55,13 +97,37 @@ function checkForWin() {
       arr.every((val, i) => i === 0 || arr[i] >= arr[i - 1])
     );
     if (isOrdered) {
-      message.textContent = "You win!";
-      message.style.color = "lime";
+      totalPoints++;
+      message.textContent = `Current Streak: ${totalPoints}`;
+      message.style.color = "white";
+      // Reset the board for a new round, but keep the deck as is
+      resetBoardForNextRound();
     } else {
-      message.textContent = "You lose!";
-      message.style.color = "red";
+      message.textContent = `Final Score: ${totalPoints}`;
+      message.style.color = "white";
+      // Optionally, disable draw button to prevent further play
+      drawButton.disabled = true;
     }
   }
+// Reset the slots and state for a new round, but keep the deck and points
+function resetBoardForNextRound() {
+  placedCards = [null, null, null, null, null];
+  drawCount = 0;
+  drawnCardValue = null;
+  // Reset slots
+  const slots = document.querySelectorAll('.slot');
+  slots.forEach(slot => {
+    slot.src = 'cards/back.png';
+    slot.alt = 'Card Back';
+    slot.dataset.filled = '';
+    slot.style.pointerEvents = '';
+  });
+  // Reset drawn card
+  drawnCard.src = 'cards/back.png';
+  drawnCard.alt = 'Card Back';
+  // Enable draw button
+  drawButton.disabled = false;
+}
 }
 
 // Draw card button click
@@ -94,6 +160,8 @@ drawButton.addEventListener('click', () => {
   if (drawCount === 5) {
     drawButton.disabled = true;
   }
+
+  // No check here; only check after 5 cards are placed (see checkForWin)
 });
 
 // Handle slot clicks

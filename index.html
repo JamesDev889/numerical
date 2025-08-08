@@ -7,26 +7,28 @@
         <link rel="stylesheet" href="numerical.css">
     </head>
     <body>
-        <h1 id="game-title">Numerical</h1>
-        <h2 id="game-description">The goal of the game is to place 5 cards in numerical order.</h2>
-        <div id="button-area">
-            <button id="draw-button">Draw Card</button>
-            <button id="new-game-button">New Game</button>
-        </div>
+        <div class="game-container">
+            <h1 id="game-title">Numerical</h1>
+            <h2 id="game-description">The goal of the game is to place 5 cards in numerical order.</h2>
+            <div id="button-area">
+                <button id="new-game-button">New Game</button>
+                <button id="draw-button">Draw Card</button>
+            </div>
 
-        <div id="message"></div>
+            <div id="message"></div>
 
-        <div id="card-area">
-            <!-- <img id="deck-card" src="cards/back.png"> -->
-            <img id="drawn-card" src="cards/back.png">
-        </div>
+            <div id="card-area">
+                <!-- <img id="deck-card" src="cards/back.png"> -->
+                <img id="drawn-card" src="cards/back.png">
+            </div>
 
-        <div id="card-area">
-            <img class="slot" src="cards/back.png">
-            <img class="slot" src="cards/back.png">
-            <img class="slot" src="cards/back.png">
-            <img class="slot" src="cards/back.png">
-            <img class="slot" src="cards/back.png">
+            <div id="slots-area">
+                <img class="slot" src="cards/back.png">
+                <img class="slot" src="cards/back.png">
+                <img class="slot" src="cards/back.png">
+                <img class="slot" src="cards/back.png">
+                <img class="slot" src="cards/back.png">
+            </div>
         </div>
         <script src="numerical.js"></script>
     </body>
