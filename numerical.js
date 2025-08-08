@@ -11,14 +11,22 @@ const deck = [
   '2-S', '3-S', '4-S', '5-S', '6-S', '7-S', '8-S', '9-S', '10-S', 'J-S', 'Q-S', 'K-S', 'A-S'
 ];
 
+/**
+ * Shuffles an array in-place using the Fisher-Yates algorithm.
+ * @param {any[]} array
+ */
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
 
-const drawButton = document.getElementById('draw-button');
-const drawnCard = document.getElementById('drawn-card');
-const newGameButton = document.getElementById('new-game-button');
-
-// Resets the game to its initial state, including the deck, slots, and UI
-newGameButton.addEventListener('click', () => {
-  // Reset deck to full
+/**
+ * Refill the deck to a full 52-card set and shuffle it.
+ * Called on New Game and after each successful round.
+ */
+function refillAndShuffleDeck() {
   deck.length = 0;
   deck.push(
     // Hearts
@@ -30,6 +38,18 @@ newGameButton.addEventListener('click', () => {
     // Spades
     '2-S', '3-S', '4-S', '5-S', '6-S', '7-S', '8-S', '9-S', '10-S', 'J-S', 'Q-S', 'K-S', 'A-S'
   );
+  shuffleArray(deck);
+}
+
+
+const drawButton = document.getElementById('draw-button');
+const drawnCard = document.getElementById('drawn-card');
+const newGameButton = document.getElementById('new-game-button');
+
+// Resets the game to its initial state, including the deck, slots, and UI
+newGameButton.addEventListener('click', () => {
+  // Reset and shuffle deck to full
+  refillAndShuffleDeck();
 
   // Reset drawn card
   drawnCard.src = 'cards/back.png';
@@ -108,6 +128,32 @@ function getAllValueCombos(values) {
 }
 
 /**
+ * Checks if, given the current placed cards, there exists at least one empty slot
+ * where placing the provided card keeps a non-decreasing sequence possible among
+ * the already filled positions (ignoring empty slots).
+ *
+ * This ensures we don't continue a round if the just-drawn card would make it
+ * impossible to ever complete a valid non-decreasing sequence.
+ * @param {string} card
+ * @returns {boolean}
+ */
+function canPlaceCardAnywhere(card) {
+  // For each empty index, try placing and see if the filled subsequence can be non-decreasing
+  for (let i = 0; i < placedCards.length; i++) {
+    if (placedCards[i] !== null) continue;
+    const hypothetical = placedCards.slice();
+    hypothetical[i] = card;
+    const filledValues = hypothetical
+      .filter(c => c !== null)
+      .map(getCardValue);
+    const combos = getAllValueCombos(filledValues);
+    const feasible = combos.some(arr => arr.every((val, idx) => idx === 0 || arr[idx] >= arr[idx - 1]));
+    if (feasible) return true;
+  }
+  return false;
+}
+
+/**
  * Checks if all placed cards form a valid non-decreasing sequence (with Ace as 1 or 14).
  * If so, increments streak and resets the board for a new round.
  * Otherwise, ends the game and displays the final score.
@@ -136,6 +182,8 @@ function checkForWin() {
  * Resets the slots and state for a new round, but keeps the deck and points.
  */
 function resetBoardForNextRound() {
+  // Start each round with a freshly shuffled full deck
+  refillAndShuffleDeck();
   placedCards = [null, null, null, null, null];
   drawCount = 0;
   drawnCardValue = null;
@@ -176,6 +224,20 @@ drawButton.addEventListener('click', () => {
   drawnCard.src = `cards/${selectedCard}.png`;
   drawnCard.alt = selectedCard;
   drawnCardValue = selectedCard;
+
+  // Immediately check if the drawn card can be placed anywhere while keeping
+  // a valid non-decreasing sequence possible. If not, end the game now.
+  if (!canPlaceCardAnywhere(drawnCardValue)) {
+    message.textContent = `Final Score: ${totalPoints}`;
+    message.style.color = 'white';
+    drawButton.disabled = true;
+    // Disable all slots to prevent further interaction
+    const allSlots = document.querySelectorAll('.slot');
+    allSlots.forEach(slot => {
+      slot.style.pointerEvents = 'none';
+    });
+    return;
+  }
 
   drawCount++;
   drawButton.disabled = true;
