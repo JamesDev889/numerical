@@ -51,6 +51,8 @@ const highScoreEl = document.getElementById('high-score');
 
 // Resets the game to its initial state, including the deck, slots, and UI
 newGameButton.addEventListener('click', () => {
+  // Reset game over flag for new game
+  window.numericalGameOver = false;
   // If button is temporarily disabled, ignore click
   if (newGameButton.classList.contains('temporarily-disabled')) return;
   // Disable New Game during shuffle animation and 1s after
@@ -314,9 +316,10 @@ function checkForWin() {
         });
       }, 1700);
     } else {
-  message.textContent = `Game Over | Final Score: ${totalPoints}`;
+      message.textContent = `Game Over | Final Score: ${totalPoints}`;
       message.style.color = "white";
-      drawButton.disabled = true;
+      // Set a global flag to indicate game over
+      window.numericalGameOver = true;
     }
   }
 }
@@ -325,6 +328,8 @@ function checkForWin() {
  * Resets the slots and state for a new round, but keeps the deck and points.
  */
 function resetBoardForNextRound(afterReset) {
+  // Reset game over flag for new round
+  window.numericalGameOver = false;
   // Start each round with a freshly shuffled full deck
   refillAndShuffleDeck();
   placedCards = [null, null, null, null, null];
@@ -397,9 +402,22 @@ slots.forEach((slot, index) => {
       drawnCard.alt = 'Card Back';
       drawnCardValue = null;
       slot.style.pointerEvents = 'none';
+      // Check if the game is still winnable after this placement
+      let stillPossible = false;
+      const filledValues = placedCards.filter(c => c !== null).map(getCardValue);
+      const combos = getAllValueCombos(filledValues);
+      stillPossible = combos.some(arr => arr.every((val, idx) => idx === 0 || arr[idx] >= arr[idx - 1]));
+      if (!stillPossible) {
+        message.textContent = `Game Over | Final Score: ${totalPoints}`;
+        message.style.color = 'white';
+        const allSlots = document.querySelectorAll('.slot');
+        allSlots.forEach(slot => { slot.style.pointerEvents = 'none'; });
+        window.numericalGameOver = true;
+        return;
+      }
       checkForWin();
-      // Draw a new card automatically unless this is the 5th card, with 500ms delay
-      if (drawCount < 5) {
+      // Only draw a new card if the game is not over
+      if (!window.numericalGameOver && drawCount < 5) {
         setTimeout(() => {
           drawNewCard();
         }, 200); // 200ms delay after placing a card
