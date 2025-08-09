@@ -93,8 +93,10 @@ newGameButton.addEventListener('click', () => {
       message.style.color = 'white';
     }
 
-    // Draw the first card automatically for new game
-    drawNewCard();
+    // Draw the first card automatically for new game, after 1s delay
+    setTimeout(() => {
+      drawNewCard();
+    }, 200);
   });
 });
 
@@ -400,7 +402,7 @@ slots.forEach((slot, index) => {
       if (drawCount < 5) {
         setTimeout(() => {
           drawNewCard();
-        }, 100);
+        }, 200); // 200ms delay after placing a card
       }
     }
   });
