@@ -77,7 +77,7 @@ newGameButton.addEventListener('click', () => {
     // Reset total points (streak); keep in-memory high score (resets on reload)
     totalPoints = 0;
     if (highScoreEl) {
-      highScoreEl.textContent = `High Score: ${highScore}`;
+      highScoreEl.innerHTML = `<span style=\"color:#4a8ff0;\">High Score:</span> <span style=\"color:white;\">${highScore}</span>`;
     }
 
     // Reset slots to empty numbered rectangles
@@ -91,8 +91,7 @@ newGameButton.addEventListener('click', () => {
 
     // Reset message
     if (message) {
-      message.textContent = 'Current Streak: 0';
-      message.style.color = 'white';
+      message.innerHTML = '<span style="color:#ff8500;">Current Streak:</span> <span style="color:white;">0</span>';
     }
 
     // Draw the first card automatically for new game, after 1s delay
@@ -111,7 +110,7 @@ let highScore = 0; // In-memory high score that resets on page reload
 
 // Initialize high score display on load
 if (highScoreEl) {
-  highScoreEl.textContent = `High Score: ${highScore}`;
+  highScoreEl.innerHTML = `<span style=\"color:#4a8ff0;\">High Score:</span> <span style=\"color:white;\">${highScore}</span>`;
 }
 
 
@@ -133,6 +132,11 @@ function getCardValue(card) {
 
 
 const message = document.getElementById('message');
+
+// Set Current Streak to orange before the game starts
+if (message) {
+  message.innerHTML = '<span style="color:#ff8500;">Current Streak:</span> <span style="color:white;">0</span>';
+}
 
 
 /**
@@ -245,13 +249,12 @@ function checkForWin() {
     );
     if (isOrdered) {
       totalPoints++;
-      message.textContent = `Current Streak: ${totalPoints}`;
-      message.style.color = "white";
+  message.innerHTML = `<span style=\"color:#ff8500;\">Current Streak:</span> <span style=\"color:white;\">${totalPoints}</span>`;
       // Update high score if needed (in-memory only; resets on reload)
       if (totalPoints > highScore) {
         highScore = totalPoints;
         if (highScoreEl) {
-          highScoreEl.textContent = `High Score: ${highScore}`;
+          highScoreEl.innerHTML = `<span style=\"color:#4a8ff0;\">High Score:</span> <span style=\"color:white;\">${highScore}</span>`;
         }
       }
       // Disable New Game during all animations
@@ -316,7 +319,7 @@ function checkForWin() {
         });
       }, 1700);
     } else {
-      message.textContent = `Game Over | Final Score: ${totalPoints}`;
+    message.innerHTML = `<span style="color:red;">Game Over</span> | <span style="color:limegreen;">Final Score:</span> <span style="color:white;">${totalPoints}</span>`;
       message.style.color = "white";
       // Set a global flag to indicate game over
       window.numericalGameOver = true;
@@ -369,7 +372,7 @@ function drawNewCard() {
   drawnCard.alt = selectedCard;
   drawnCardValue = selectedCard;
   if (!canPlaceCardAnywhere(drawnCardValue)) {
-  message.textContent = `Game Over | Final Score: ${totalPoints}`;
+    message.innerHTML = `<span style="color:red;">Game Over</span> | <span style="color:limegreen;">Final Score:</span> <span style="color:white;">${totalPoints}</span>`;
     message.style.color = 'white';
     // Disable all slots to prevent further interaction
     const allSlots = document.querySelectorAll('.slot');
