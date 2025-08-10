@@ -411,8 +411,7 @@ slots.forEach((slot, index) => {
       const combos = getAllValueCombos(filledValues);
       stillPossible = combos.some(arr => arr.every((val, idx) => idx === 0 || arr[idx] >= arr[idx - 1]));
       if (!stillPossible) {
-        message.textContent = `Game Over | Final Score: ${totalPoints}`;
-        message.style.color = 'white';
+        message.innerHTML = `<span style="color:red;">Game Over</span> | <span style="color:limegreen;">Final Score:</span> <span style="color:white;">${totalPoints}</span>`;
         const allSlots = document.querySelectorAll('.slot');
         allSlots.forEach(slot => { slot.style.pointerEvents = 'none'; });
         window.numericalGameOver = true;
