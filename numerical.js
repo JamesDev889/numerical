@@ -1,3 +1,133 @@
+// Make Free Space button a toggle: green border stays while active
+const freeSpaceButton = document.getElementById('free-space-button');
+if (freeSpaceButton) {
+  freeSpaceButton.addEventListener('click', () => {
+    freeSpaceButton.classList.toggle('active');
+    // Clear the board/UI but do not start a new game or shuffle the deck
+    // Reset slots to empty numbered rectangles
+    const slots = document.querySelectorAll('.slot');
+    slots.forEach((slot, i) => {
+      slot.classList.remove('filled');
+      slot.dataset.filled = '';
+      slot.style.pointerEvents = '';
+      slot.innerHTML = `<span class="slot-number">${i + 1}</span>`;
+    });
+    // Reset drawn card
+    if (drawnCard) {
+      drawnCard.src = 'cards/back.png';
+      drawnCard.alt = 'Card Back';
+    }
+    // Reset placed cards and draw count
+    placedCards = [null, null, null, null, null];
+    freeSpaceCard = null;
+    drawCount = 0;
+    // Reset streak/message
+    if (typeof totalPoints !== 'undefined') totalPoints = 0;
+    if (message) {
+      message.innerHTML = '<span style="color:#ff8500;">Current Streak:</span> <span style="color:white;">0</span>';
+    }
+    // Clear high score
+    if (typeof highScore !== 'undefined') highScore = 0;
+    if (highScoreEl) {
+      highScoreEl.innerHTML = `<span style=\"color:#4a8ff0;\">High Score:</span> <span style=\"color:white;\">0</span>`;
+    }
+
+    // Toggle green free space slot next to the drawn card
+    const cardArea = document.getElementById('card-area');
+    const existingFreeSlot = document.getElementById('free-space-slot');
+    if (freeSpaceButton.classList.contains('active')) {
+      if (!existingFreeSlot && cardArea) {
+        const freeSlot = document.createElement('div');
+        freeSlot.id = 'free-space-slot';
+        freeSlot.className = 'free-slot';
+        freeSlot.innerHTML = '<span class="slot-number">FREE</span>';
+                 cardArea.appendChild(freeSlot);
+         
+         // Add click handler for drawn card to toggle selection
+         drawnCard.addEventListener('click', () => {
+           if (freeSpaceCard && drawnCardValue) {
+             // Toggle selection between drawn card and free space card
+             if (freeSlot.classList.contains('active')) {
+               // Switch selection to drawn card
+               freeSlot.classList.remove('active');
+               drawnCard.classList.add('active');
+             } else {
+               // Switch selection to free space card
+               drawnCard.classList.remove('active');
+               freeSlot.classList.add('active');
+             }
+           }
+         });
+         
+         // Add click handler for free space slot
+         freeSlot.addEventListener('click', () => {
+           if (drawnCardValue && !freeSlot.dataset.filled) {
+             // Place the drawn card in free space
+             freeSlot.innerHTML = '';
+             const img = document.createElement('img');
+             img.src = `cards/${drawnCardValue}.png`;
+             img.alt = drawnCardValue;
+             freeSlot.appendChild(img);
+             freeSlot.classList.add('filled');
+             freeSpaceCard = drawnCardValue;
+             freeSlot.dataset.filled = "true";
+             drawnCard.src = 'cards/back.png';
+             drawnCard.alt = 'Card Back';
+             drawnCardValue = null;
+             
+             // Remove active class from drawn card and add to free space
+             drawnCard.classList.remove('active');
+             freeSlot.classList.add('active');
+             
+                           // Draw a new card after placing in free space
+              const maxCards = freeSpaceButton && freeSpaceButton.classList.contains('active') ? 6 : 5;
+              if (!window.numericalGameOver && drawCount < maxCards) {
+                setTimeout(() => {
+                  drawNewCard();
+                }, 200);
+              }
+           } else if (freeSpaceCard && !drawnCardValue) {
+             // Pick up card from free space
+             drawnCardValue = freeSpaceCard;
+             drawnCard.src = `cards/${freeSpaceCard}.png`;
+             drawnCard.alt = freeSpaceCard;
+             freeSpaceCard = null;
+             freeSlot.innerHTML = '<span class="slot-number">FREE</span>';
+             freeSlot.classList.remove('filled');
+             freeSlot.dataset.filled = '';
+             
+             // Remove active class from free space and add to drawn card
+             freeSlot.classList.remove('active');
+             drawnCard.classList.add('active');
+           } else if (freeSpaceCard && !drawnCardValue && !freeSlot.classList.contains('active')) {
+             // If free space has a card and no drawn card, and free space is not active, make it active
+             freeSlot.classList.add('active');
+           } else if (freeSpaceCard && drawnCardValue) {
+             // Toggle selection between drawn card and free space card
+             if (drawnCard.classList.contains('active')) {
+               // Switch selection to free space card
+               drawnCard.classList.remove('active');
+               freeSlot.classList.add('active');
+             } else {
+               // Switch selection to drawn card
+               freeSlot.classList.remove('active');
+               drawnCard.classList.add('active');
+             }
+           }
+         });
+      }
+         } else if (existingFreeSlot) {
+       // Return card to deck if free space is being removed
+       if (freeSpaceCard) {
+         freeSpaceCard = null;
+       }
+       existingFreeSlot.remove();
+       
+               // Remove active class from drawn card when free space is disabled
+        drawnCard.classList.remove('active');
+     }
+  });
+}
 
 // The deck of cards, one for each suit and rank
 const deck = [
@@ -40,6 +170,34 @@ function refillAndShuffleDeck() {
   );
   shuffleArray(deck);
 }
+
+/**
+ * Refill the deck to a full 52-card set excluding the free space card, and shuffle it.
+ * Called after each successful round when free space is enabled.
+ */
+function refillAndShuffleDeckExcludingFreeSpace() {
+  deck.length = 0;
+  deck.push(
+    // Hearts
+    '2-H', '3-H', '4-H', '5-H', '6-H', '7-H', '8-H', '9-H', '10-H', 'J-H', 'Q-H', 'K-H', 'A-H',
+    // Diamonds
+    '2-D', '3-D', '4-D', '5-D', '6-D', '7-D', '8-D', '9-D', '10-D', 'J-D', 'Q-D', 'K-D', 'A-D',
+    // Clubs
+    '2-C', '3-C', '4-C', '5-C', '6-C', '7-C', '8-C', '9-C', '10-C', 'J-C', 'Q-C', 'K-C', 'A-C',
+    // Spades
+    '2-S', '3-S', '4-S', '5-S', '6-S', '7-S', '8-S', '9-S', '10-S', 'J-S', 'Q-S', 'K-S', 'A-S'
+  );
+  
+  // Remove the free space card from the deck if it exists
+  if (freeSpaceCard) {
+    const index = deck.indexOf(freeSpaceCard);
+    if (index > -1) {
+      deck.splice(index, 1);
+    }
+  }
+  
+  shuffleArray(deck);
+}
 // Shuffle once on initial load to start the first round
 refillAndShuffleDeck();
 
@@ -57,8 +215,18 @@ newGameButton.addEventListener('click', () => {
   if (newGameButton.classList.contains('temporarily-disabled')) return;
   // Disable New Game during shuffle animation and 1s after
   newGameButton.classList.add('temporarily-disabled');
+  
+  // Collect all cards to animate back to deck (including free space card)
   const slotsEls = Array.from(document.querySelectorAll('#slots-area .slot'));
-  animateCardsBackToDeck(slotsEls).then(() => {
+  const freeSpaceSlot = document.getElementById('free-space-slot');
+  const cardsToAnimate = [...slotsEls];
+  
+  // Add free space card to animation if it exists
+  if (freeSpaceSlot && freeSpaceSlot.classList.contains('filled')) {
+    cardsToAnimate.push(freeSpaceSlot);
+  }
+  
+  animateCardsBackToDeck(cardsToAnimate).then(() => {
     setTimeout(() => {
       newGameButton.classList.remove('temporarily-disabled');
     }, 1000);
@@ -69,9 +237,11 @@ newGameButton.addEventListener('click', () => {
     drawnCard.src = 'cards/back.png';
     drawnCard.alt = 'Card Back';
     drawnCardValue = null;
+    drawnCard.classList.remove('active');
 
     // Reset placed cards and draw count
     placedCards = [null, null, null, null, null];
+    freeSpaceCard = null;
     drawCount = 0;
 
     // Reset total points (streak); keep in-memory high score (resets on reload)
@@ -89,6 +259,14 @@ newGameButton.addEventListener('click', () => {
       slot.innerHTML = `<span class=\"slot-number\">${i + 1}</span>`;
     });
 
+    // Reset free space slot if it exists
+    if (freeSpaceSlot) {
+      freeSpaceSlot.innerHTML = '<span class="slot-number">FREE</span>';
+      freeSpaceSlot.classList.remove('filled');
+      freeSpaceSlot.classList.remove('active');
+      freeSpaceSlot.dataset.filled = '';
+    }
+
     // Reset message
     if (message) {
       message.innerHTML = '<span style="color:#ff8500;">Current Streak:</span> <span style="color:white;">0</span>';
@@ -104,6 +282,7 @@ newGameButton.addEventListener('click', () => {
 
 let drawnCardValue = null; // Stores the currently drawn card
 let placedCards = [null, null, null, null, null]; // Tracks cards placed in slots
+let freeSpaceCard = null; // Stores the card in the free space slot
 let drawCount = 0; // Counts how many cards have been drawn in the current round
 let totalPoints = 0; // Running total of points (streaks)
 let highScore = 0; // In-memory high score that resets on page reload
@@ -220,7 +399,49 @@ function getAllValueCombos(values) {
  * @returns {boolean}
  */
 function canPlaceCardAnywhere(card) {
-  // For each empty index, try placing and see if the filled subsequence can be non-decreasing
+  // Check if card can be placed in any regular slot
+  for (let i = 0; i < placedCards.length; i++) {
+    if (placedCards[i] !== null) continue;
+    const hypothetical = placedCards.slice();
+    hypothetical[i] = card;
+    const filledValues = hypothetical
+      .filter(c => c !== null)
+      .map(getCardValue);
+    const combos = getAllValueCombos(filledValues);
+    const feasible = combos.some(arr => arr.every((val, idx) => idx === 0 || arr[idx] >= arr[idx - 1]));
+    if (feasible) return true;
+  }
+  
+  // If free space is enabled and empty, card can always be placed there
+  if (freeSpaceButton && freeSpaceButton.classList.contains('active') && !freeSpaceCard) {
+    return true;
+  }
+  
+  return false;
+}
+
+/**
+ * Checks if the game can continue with the current drawn card and free space card.
+ * Game can continue if either card can be placed somewhere.
+ */
+function canGameContinue() {
+  // If there's a drawn card that can be placed, game can continue
+  if (drawnCardValue && canPlaceCardAnywhere(drawnCardValue)) {
+    return true;
+  }
+  
+  // If there's a free space card that can be placed in regular slots, game can continue
+  if (freeSpaceCard && canPlaceInRegularSlots(freeSpaceCard)) {
+    return true;
+  }
+  
+  return false;
+}
+
+/**
+ * Checks if a card can be placed in any regular slot (not including free space).
+ */
+function canPlaceInRegularSlots(card) {
   for (let i = 0; i < placedCards.length; i++) {
     if (placedCards[i] !== null) continue;
     const hypothetical = placedCards.slice();
@@ -333,8 +554,20 @@ function checkForWin() {
 function resetBoardForNextRound(afterReset) {
   // Reset game over flag for new round
   window.numericalGameOver = false;
-  // Start each round with a freshly shuffled full deck
-  refillAndShuffleDeck();
+  
+  // Check if free space is enabled and has a card
+  const freeSpaceEnabled = freeSpaceButton && freeSpaceButton.classList.contains('active');
+  const hasFreeSpaceCard = freeSpaceCard !== null;
+  
+  // If free space is enabled and has a card, exclude it from the deck
+  if (freeSpaceEnabled && hasFreeSpaceCard) {
+    refillAndShuffleDeckExcludingFreeSpace();
+  } else {
+    // Otherwise, use full deck (free space disabled or no card in free space)
+    refillAndShuffleDeck();
+    freeSpaceCard = null;
+  }
+  
   placedCards = [null, null, null, null, null];
   drawCount = 0;
   drawnCardValue = null;
@@ -364,21 +597,37 @@ function drawNewCard() {
     alert("No more cards!");
     return;
   }
-  if (drawCount >= 5) {
+  
+  // Allow 6th card if free space is enabled, otherwise limit to 5
+  const maxCards = freeSpaceButton && freeSpaceButton.classList.contains('active') ? 6 : 5;
+  
+  if (drawCount >= maxCards) {
     return;
   }
   const selectedCard = deck.pop();
   drawnCard.src = `cards/${selectedCard}.png`;
   drawnCard.alt = selectedCard;
   drawnCardValue = selectedCard;
-  if (!canPlaceCardAnywhere(drawnCardValue)) {
-  message.innerHTML = `<span style="color:red;">Game Over</span> <span style="color:white;">|</span> <span style="color:limegreen;">Final Score:</span> <span style="color:white;">${totalPoints}</span>`;
+  
+  // Only add active class if free space is enabled
+  if (freeSpaceButton && freeSpaceButton.classList.contains('active')) {
+    drawnCard.classList.add('active');
+    const freeSlot = document.getElementById('free-space-slot');
+    if (freeSlot) {
+      freeSlot.classList.remove('active');
+    }
+  }
+  
+  // Check if game can continue with current cards
+  if (!canGameContinue()) {
+    message.innerHTML = `<span style="color:red;">Game Over</span> <span style="color:white;">|</span> <span style="color:limegreen;">Final Score:</span> <span style="color:white;">${totalPoints}</span>`;
     message.style.color = 'white';
     // Disable all slots to prevent further interaction
     const allSlots = document.querySelectorAll('.slot');
     allSlots.forEach(slot => {
       slot.style.pointerEvents = 'none';
     });
+    window.numericalGameOver = true;
     return;
   }
   drawCount++;
@@ -391,7 +640,12 @@ function drawNewCard() {
 const slots = document.querySelectorAll('.slot');
 slots.forEach((slot, index) => {
   slot.addEventListener('click', () => {
-    if (drawnCardValue && !slot.dataset.filled) {
+    // Place drawn card if it's the active card or if free space is not enabled
+    const freeSpaceEnabled = freeSpaceButton && freeSpaceButton.classList.contains('active');
+    const canPlaceDrawnCard = drawnCardValue && !slot.dataset.filled && 
+                              (!freeSpaceEnabled || drawnCard.classList.contains('active'));
+    
+    if (canPlaceDrawnCard) {
       // Place the drawn card in clicked slot
       slot.innerHTML = '';
       const img = document.createElement('img');
@@ -404,7 +658,9 @@ slots.forEach((slot, index) => {
       drawnCard.src = 'cards/back.png';
       drawnCard.alt = 'Card Back';
       drawnCardValue = null;
+      drawnCard.classList.remove('active');
       slot.style.pointerEvents = 'none';
+      
       // Check if the game is still winnable after this placement
       let stillPossible = false;
       const filledValues = placedCards.filter(c => c !== null).map(getCardValue);
@@ -418,12 +674,53 @@ slots.forEach((slot, index) => {
         return;
       }
       checkForWin();
-      // Only draw a new card if the game is not over
-      if (!window.numericalGameOver && drawCount < 5) {
+      // Only draw a new card if the game is not over and no win occurred
+      const maxCards = freeSpaceButton && freeSpaceButton.classList.contains('active') ? 6 : 5;
+      if (!window.numericalGameOver && drawCount < maxCards && !placedCards.every(card => card !== null)) {
         setTimeout(() => {
           drawNewCard();
         }, 200); // 200ms delay after placing a card
       }
+    } else if (freeSpaceCard && document.getElementById('free-space-slot')?.classList.contains('active') && !slot.dataset.filled) {
+      // Place the free space card in clicked slot
+      slot.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = `cards/${freeSpaceCard}.png`;
+      img.alt = freeSpaceCard;
+      slot.appendChild(img);
+      slot.classList.add('filled');
+      placedCards[index] = freeSpaceCard;
+      slot.dataset.filled = "true";
+      freeSpaceCard = null;
+      slot.style.pointerEvents = 'none';
+      
+             // Clear the free space slot
+       const freeSlot = document.getElementById('free-space-slot');
+       if (freeSlot) {
+         freeSlot.innerHTML = '<span class="slot-number">FREE</span>';
+         freeSlot.classList.remove('filled');
+         freeSlot.classList.remove('active');
+         freeSlot.dataset.filled = '';
+       }
+       
+       // Automatically select the drawn card after placing free space card
+       if (drawnCardValue) {
+         drawnCard.classList.add('active');
+       }
+      
+      // Check if the game is still winnable after this placement
+      let stillPossible = false;
+      const filledValues = placedCards.filter(c => c !== null).map(getCardValue);
+      const combos = getAllValueCombos(filledValues);
+      stillPossible = combos.some(arr => arr.every((val, idx) => idx === 0 || arr[idx] >= arr[idx - 1]));
+      if (!stillPossible) {
+  message.innerHTML = `<span style="color:red;">Game Over</span> <span style="color:white;">|</span> <span style="color:limegreen;">Final Score:</span> <span style="color:white;">${totalPoints}</span>`;
+        const allSlots = document.querySelectorAll('.slot');
+        allSlots.forEach(slot => { slot.style.pointerEvents = 'none'; });
+        window.numericalGameOver = true;
+        return;
+      }
+      checkForWin();
     }
   });
 });
