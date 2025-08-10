@@ -319,7 +319,7 @@ function checkForWin() {
         });
       }, 1700);
     } else {
-    message.innerHTML = `<span style="color:red;">Game Over</span> | <span style="color:limegreen;">Final Score:</span> <span style="color:white;">${totalPoints}</span>`;
+  message.innerHTML = `<span style="color:red;">Game Over</span> <span style="color:white;">|</span> <span style="color:limegreen;">Final Score:</span> <span style="color:white;">${totalPoints}</span>`;
       message.style.color = "white";
       // Set a global flag to indicate game over
       window.numericalGameOver = true;
@@ -372,7 +372,7 @@ function drawNewCard() {
   drawnCard.alt = selectedCard;
   drawnCardValue = selectedCard;
   if (!canPlaceCardAnywhere(drawnCardValue)) {
-    message.innerHTML = `<span style="color:red;">Game Over</span> | <span style="color:limegreen;">Final Score:</span> <span style="color:white;">${totalPoints}</span>`;
+  message.innerHTML = `<span style="color:red;">Game Over</span> <span style="color:white;">|</span> <span style="color:limegreen;">Final Score:</span> <span style="color:white;">${totalPoints}</span>`;
     message.style.color = 'white';
     // Disable all slots to prevent further interaction
     const allSlots = document.querySelectorAll('.slot');
@@ -411,7 +411,7 @@ slots.forEach((slot, index) => {
       const combos = getAllValueCombos(filledValues);
       stillPossible = combos.some(arr => arr.every((val, idx) => idx === 0 || arr[idx] >= arr[idx - 1]));
       if (!stillPossible) {
-        message.innerHTML = `<span style="color:red;">Game Over</span> | <span style="color:limegreen;">Final Score:</span> <span style="color:white;">${totalPoints}</span>`;
+  message.innerHTML = `<span style="color:red;">Game Over</span> <span style="color:white;">|</span> <span style="color:limegreen;">Final Score:</span> <span style="color:white;">${totalPoints}</span>`;
         const allSlots = document.querySelectorAll('.slot');
         allSlots.forEach(slot => { slot.style.pointerEvents = 'none'; });
         window.numericalGameOver = true;
