@@ -536,14 +536,14 @@ body {
 }
 
 /* When a card image is placed, let the image fill the slot */
-.slot.filled {
+/*.slot.filled {
     padding: 0;
 }
 .slot.filled img {
     width: 120px;
     height: 168px;
     border-radius: 6px;
-}
+}*/
 
 /* Wave animation for winning row */
 @keyframes waveY {

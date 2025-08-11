@@ -1,22 +1,23 @@
-// Make Free Space button a toggle: green border stays while active
 const freeSpaceButton = document.getElementById('free-space-button');
-if (freeSpaceButton) {
+
+  // When the free spcace button is clicked, toggle green on/off button border, reset the slots, free space, and draw card, 
   freeSpaceButton.addEventListener('click', () => {
+    // Toggles a css rule for the green border on the free space button
     freeSpaceButton.classList.toggle('active');
-    // Clear the board/UI but do not start a new game or shuffle the deck
-    // Reset slots to empty numbered rectangles
+    // Creates a nodelist for all 5 slots
     const slots = document.querySelectorAll('.slot');
+    // Calls the function once per slot
     slots.forEach((slot, i) => {
-      slot.classList.remove('filled');
-      slot.dataset.filled = '';
-      slot.style.pointerEvents = '';
+      //slot.classList.remove('filled');
+      //slot.dataset.filled = '';
+      //slot.style.pointerEvents = '';
+      // Replaces any card images on slots with html text of each slot number
       slot.innerHTML = `<span class="slot-number">${i + 1}</span>`;
     });
-    // Reset drawn card
-    if (drawnCard) {
-      drawnCard.src = 'cards/back.png';
-      drawnCard.alt = 'Card Back';
-    }
+
+    drawnCard.src = 'cards/back.png';
+    //drawnCard.alt = 'Card Back';
+    drawnCardValue = null;
     // Reset placed cards and draw count
     placedCards = [null, null, null, null, null];
     freeSpaceCard = null;
@@ -85,7 +86,6 @@ if (freeSpaceButton) {
         drawnCard.classList.remove('active');
      }
   });
-}
 
 // The deck of cards, one for each suit and rank
 const deck = [
