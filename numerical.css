@@ -21,6 +21,7 @@
   border: 4px solid transparent;
   border-radius: 8px;
   box-sizing: border-box;
+  cursor: pointer;
 }
 
 #draw-button:hover,
@@ -200,6 +201,20 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
     align-items: center;
     gap: 30px;
     margin-bottom: 30px;
+}
+
+.button-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+@media (pointer: coarse) {
+  .button-row {
+    gap: 24px;
+  }
 }
 
 #game-description {
@@ -564,4 +579,12 @@ body {
     #slots-area .slot:nth-child(5) {
         margin-bottom: 500px;
     }
+}
+
+/* Touch devices in landscape: add 100px padding to edges of slots row */
+@media (pointer: coarse) and (orientation: landscape) {
+  #slots-area {
+    padding-left: 100px;
+    padding-right: 100px;
+  }
 }
