@@ -826,5 +826,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
     });
+    
+    // Center horizontal scroll for touch devices in landscape mode
+    function centerHorizontalScroll() {
+      if (window.innerWidth > window.innerHeight) { // Landscape mode
+        const slotsArea = document.getElementById('slots-area');
+        if (slotsArea) {
+          const containerWidth = window.innerWidth;
+          const slotsWidth = slotsArea.scrollWidth;
+          const centerOffset = (slotsWidth - containerWidth) / 2;
+          
+          if (centerOffset > 0) {
+            window.scrollTo({
+              left: centerOffset,
+              behavior: 'smooth'
+            });
+          }
+        }
+      }
+    }
+    
+    // Center scroll on page load
+    centerHorizontalScroll();
+    
+    // Center scroll on orientation change
+    window.addEventListener('orientationchange', () => {
+      setTimeout(centerHorizontalScroll, 100); // Small delay to ensure layout is updated
+    });
+    
+    // Center scroll on window resize (for devices that don't trigger orientationchange)
+    window.addEventListener('resize', () => {
+      setTimeout(centerHorizontalScroll, 100);
+    });
   }
 });
