@@ -43,20 +43,9 @@ if (freeSpaceButton) {
         freeSlot.innerHTML = '<span class="slot-number">FREE</span>';
                  cardArea.appendChild(freeSlot);
          
-         // Add click handler for drawn card to toggle selection
+         // Add click handler for drawn card (no toggle behavior)
          drawnCard.addEventListener('click', () => {
-           if (freeSpaceCard && drawnCardValue) {
-             // Toggle selection between drawn card and free space card
-             if (freeSlot.classList.contains('active')) {
-               // Switch selection to drawn card
-               freeSlot.classList.remove('active');
-               drawnCard.classList.add('active');
-             } else {
-               // Switch selection to free space card
-               drawnCard.classList.remove('active');
-               freeSlot.classList.add('active');
-             }
-           }
+           // Do nothing; drawn card remains the selected card
          });
          
          // Add click handler for free space slot
@@ -75,10 +64,6 @@ if (freeSpaceButton) {
              drawnCard.alt = 'Card Back';
              drawnCardValue = null;
              
-             // Remove active class from drawn card and add to free space
-             drawnCard.classList.remove('active');
-             freeSlot.classList.add('active');
-             
                            // Draw a new card after placing in free space
               const maxCards = freeSpaceButton && freeSpaceButton.classList.contains('active') ? 6 : 5;
               if (!window.numericalGameOver && drawCount < maxCards) {
@@ -86,33 +71,6 @@ if (freeSpaceButton) {
                   drawNewCard();
                 }, 200);
               }
-           } else if (freeSpaceCard && !drawnCardValue) {
-             // Pick up card from free space
-             drawnCardValue = freeSpaceCard;
-             drawnCard.src = `cards/${freeSpaceCard}.png`;
-             drawnCard.alt = freeSpaceCard;
-             freeSpaceCard = null;
-             freeSlot.innerHTML = '<span class="slot-number">FREE</span>';
-             freeSlot.classList.remove('filled');
-             freeSlot.dataset.filled = '';
-             
-             // Remove active class from free space and add to drawn card
-             freeSlot.classList.remove('active');
-             drawnCard.classList.add('active');
-           } else if (freeSpaceCard && !drawnCardValue && !freeSlot.classList.contains('active')) {
-             // If free space has a card and no drawn card, and free space is not active, make it active
-             freeSlot.classList.add('active');
-           } else if (freeSpaceCard && drawnCardValue) {
-             // Toggle selection between drawn card and free space card
-             if (drawnCard.classList.contains('active')) {
-               // Switch selection to free space card
-               drawnCard.classList.remove('active');
-               freeSlot.classList.add('active');
-             } else {
-               // Switch selection to drawn card
-               freeSlot.classList.remove('active');
-               drawnCard.classList.add('active');
-             }
            }
          });
       }
@@ -144,6 +102,9 @@ const deck = [
 /**
  * Shuffles an array in-place using the Fisher-Yates algorithm.
  * @param {any[]} array
+/**
+ * Shuffle an array using the Fisher-Yates algorithm.
+ * @param {Array} array - The array to shuffle
  */
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -319,10 +280,12 @@ if (message) {
 
 
 /**
- * Animates any card images currently in the provided slots to fly back to the deck (drawn card) position.
- * Returns a Promise that resolves when all animations complete (including removal of clones).
- * @param {HTMLElement[]} slotsEls
- * @returns {Promise<void>}
+ * Animates card images from their current positions back to the deck (drawn card position).
+ * Creates cloned images that fly across the screen with scaling and opacity effects.
+ * Used when starting a new game or after winning a round to visually return cards to deck.
+ * 
+ * @param {HTMLElement[]} slotsEls - Array of slot elements containing card images to animate
+ * @returns {Promise<void>} - Resolves when all card animations complete and clones are removed
  */
 function animateCardsBackToDeck(slotsEls) {
   return new Promise(resolveOuter => {
@@ -430,11 +393,6 @@ function canGameContinue() {
     return true;
   }
   
-  // If there's a free space card that can be placed in regular slots, game can continue
-  if (freeSpaceCard && canPlaceInRegularSlots(freeSpaceCard)) {
-    return true;
-  }
-  
   return false;
 }
 
@@ -498,8 +456,10 @@ function checkForWin() {
         const containerScrollX = window.scrollX;
         const containerScrollY = window.scrollY;
 
-        // Create flying clones from each filled slot image
+        // Create flying clones from each filled slot image and free space card
         const flyPromises = [];
+        
+        // Animate regular slot cards
         slotsEls.forEach(slot => {
           const img = slot.querySelector('img');
           if (!img) return;
@@ -529,6 +489,39 @@ function checkForWin() {
             }, 650);
           }));
         });
+        
+        // Animate free space card if it exists
+        const freeSpaceSlot = document.getElementById('free-space-slot');
+        if (freeSpaceSlot && freeSpaceSlot.classList.contains('filled')) {
+          const img = freeSpaceSlot.querySelector('img');
+          if (img) {
+            const rect = img.getBoundingClientRect();
+            const clone = img.cloneNode(true);
+            clone.classList.add('flying-card');
+            clone.style.left = `${rect.left + containerScrollX}px`;
+            clone.style.top = `${rect.top + containerScrollY}px`;
+            clone.style.transform = 'translate(0, 0)';
+            clone.style.opacity = '1';
+            document.body.appendChild(clone);
+
+            // Force reflow then move towards deck
+            // eslint-disable-next-line no-unused-expressions
+            clone.offsetHeight;
+            const dx = deckTarget.left - rect.left;
+            const dy = deckTarget.top - rect.top;
+            requestAnimationFrame(() => {
+              clone.style.transform = `translate(${dx}px, ${dy}px) scale(0.6)`;
+              clone.style.opacity = '0';
+            });
+
+            flyPromises.push(new Promise(resolve => {
+              setTimeout(() => {
+                clone.remove();
+                resolve();
+              }, 650);
+            }));
+          }
+        }
 
         Promise.all(flyPromises).then(() => {
           setTimeout(() => {
@@ -555,18 +548,9 @@ function resetBoardForNextRound(afterReset) {
   // Reset game over flag for new round
   window.numericalGameOver = false;
   
-  // Check if free space is enabled and has a card
-  const freeSpaceEnabled = freeSpaceButton && freeSpaceButton.classList.contains('active');
-  const hasFreeSpaceCard = freeSpaceCard !== null;
-  
-  // If free space is enabled and has a card, exclude it from the deck
-  if (freeSpaceEnabled && hasFreeSpaceCard) {
-    refillAndShuffleDeckExcludingFreeSpace();
-  } else {
-    // Otherwise, use full deck (free space disabled or no card in free space)
-    refillAndShuffleDeck();
-    freeSpaceCard = null;
-  }
+  // Always refill and shuffle the full deck, including any card that was in free space
+  refillAndShuffleDeck();
+  freeSpaceCard = null;
   
   placedCards = [null, null, null, null, null];
   drawCount = 0;
@@ -579,6 +563,14 @@ function resetBoardForNextRound(afterReset) {
     slot.style.pointerEvents = '';
     slot.innerHTML = `<span class="slot-number">${i + 1}</span>`;
   });
+  
+  // Reset free space slot to show "FREE"
+  const freeSpaceSlot = document.getElementById('free-space-slot');
+  if (freeSpaceSlot) {
+    freeSpaceSlot.innerHTML = '<span class="slot-number">FREE</span>';
+    freeSpaceSlot.classList.remove('filled');
+    freeSpaceSlot.dataset.filled = '';
+  }
   // Reset drawn card
   drawnCard.src = 'cards/back.png';
   drawnCard.alt = 'Card Back';
@@ -589,9 +581,9 @@ function resetBoardForNextRound(afterReset) {
 
 
 /**
- * Handles the draw card button click: draws a random card, updates the UI, and disables the button until placed.
+ * Draws a new card from the deck, updates the UI, and checks if the game can continue.
+ * If the game cannot continue with the current cards, it ends the game.
  */
-
 function drawNewCard() {
   if (deck.length === 0) {
     alert("No more cards!");
@@ -681,46 +673,6 @@ slots.forEach((slot, index) => {
           drawNewCard();
         }, 200); // 200ms delay after placing a card
       }
-    } else if (freeSpaceCard && document.getElementById('free-space-slot')?.classList.contains('active') && !slot.dataset.filled) {
-      // Place the free space card in clicked slot
-      slot.innerHTML = '';
-      const img = document.createElement('img');
-      img.src = `cards/${freeSpaceCard}.png`;
-      img.alt = freeSpaceCard;
-      slot.appendChild(img);
-      slot.classList.add('filled');
-      placedCards[index] = freeSpaceCard;
-      slot.dataset.filled = "true";
-      freeSpaceCard = null;
-      slot.style.pointerEvents = 'none';
-      
-             // Clear the free space slot
-       const freeSlot = document.getElementById('free-space-slot');
-       if (freeSlot) {
-         freeSlot.innerHTML = '<span class="slot-number">FREE</span>';
-         freeSlot.classList.remove('filled');
-         freeSlot.classList.remove('active');
-         freeSlot.dataset.filled = '';
-       }
-       
-       // Automatically select the drawn card after placing free space card
-       if (drawnCardValue) {
-         drawnCard.classList.add('active');
-       }
-      
-      // Check if the game is still winnable after this placement
-      let stillPossible = false;
-      const filledValues = placedCards.filter(c => c !== null).map(getCardValue);
-      const combos = getAllValueCombos(filledValues);
-      stillPossible = combos.some(arr => arr.every((val, idx) => idx === 0 || arr[idx] >= arr[idx - 1]));
-      if (!stillPossible) {
-  message.innerHTML = `<span style="color:red;">Game Over</span> <span style="color:white;">|</span> <span style="color:limegreen;">Final Score:</span> <span style="color:white;">${totalPoints}</span>`;
-        const allSlots = document.querySelectorAll('.slot');
-        allSlots.forEach(slot => { slot.style.pointerEvents = 'none'; });
-        window.numericalGameOver = true;
-        return;
-      }
-      checkForWin();
     }
   });
 });
@@ -827,7 +779,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
     
-    // Center horizontal scroll for touch devices in landscape mode
+    /**
+     * Centers the horizontal scroll position for touch devices in landscape mode.
+     * This ensures the slots area is centered on the screen.
+     */
     function centerHorizontalScroll() {
       if (window.innerWidth > window.innerHeight) { // Landscape mode
         const slotsArea = document.getElementById('slots-area');

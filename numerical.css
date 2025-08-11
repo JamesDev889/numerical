@@ -308,12 +308,7 @@ body {
     border-radius: 6px;
 }
 
-/* Active card selection styling */
-#drawn-card.active,
-.free-slot.active {
-    outline: 4px solid #ff8500;
-    outline-offset: 0;
-}
+/* Active card selection styling removed: drawn card is always selected */
 
 /* Make drawn card clickable when free space is enabled */
 #drawn-card {
