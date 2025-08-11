@@ -822,7 +822,7 @@ document.addEventListener('DOMContentLoaded', () => {
           button.classList.add('touch-feedback');
           setTimeout(() => {
             button.classList.remove('touch-feedback');
-          }, 100);
+          }, 150);
         });
       }
     });

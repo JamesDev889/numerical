@@ -38,13 +38,13 @@
   }
 }
 
-/* Touch device button feedback - gray for 100ms after click */
+/* Touch device button feedback - gray for 150ms after click */
 @media (pointer: coarse) {
   #draw-button.touch-feedback,
   #new-game-button.touch-feedback,
   #free-space-button.touch-feedback {
     background: rgb(192, 192, 192) !important;
-    transition: background 0.1s ease !important;
+    transition: background 0.15s ease !important;
   }
 }
 
