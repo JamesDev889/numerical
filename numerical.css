@@ -567,6 +567,6 @@ body {
 @media (pointer: coarse) {
     #slots-area .slot:nth-child(4),
     #slots-area .slot:nth-child(5) {
-        margin-bottom: 100px;
+        margin-bottom: 500px;
     }
 }
