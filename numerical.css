@@ -563,17 +563,10 @@ body {
 
 /* removed history styling */
 
-/* Test text for touch devices */
+/* Mobile margin for 4th and 5th slots */
 @media (pointer: coarse) {
-    #slots-area::after {
-        content: "test";
-        display: block;
-        text-align: center;
-        color: white;
-        font-family: Arial;
-        font-size: 2rem;
-        margin-top: 20px;
-        grid-column: 2 / 6;
-        grid-row: 3;
+    #slots-area .slot:nth-child(4),
+    #slots-area .slot:nth-child(5) {
+        margin-bottom: 100px;
     }
 }
