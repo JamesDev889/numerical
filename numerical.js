@@ -724,3 +724,91 @@ slots.forEach((slot, index) => {
     }
   });
 });
+
+// Initialize free space on page load if button is active
+document.addEventListener('DOMContentLoaded', () => {
+  if (freeSpaceButton && freeSpaceButton.classList.contains('active')) {
+    // Create the free space slot
+    const cardArea = document.getElementById('card-area');
+    if (cardArea) {
+      const freeSlot = document.createElement('div');
+      freeSlot.id = 'free-space-slot';
+      freeSlot.className = 'free-slot';
+      freeSlot.innerHTML = '<span class="slot-number">FREE</span>';
+      cardArea.appendChild(freeSlot);
+      
+      // Add click handler for drawn card to toggle selection
+      drawnCard.addEventListener('click', () => {
+        if (freeSpaceCard && drawnCardValue) {
+          // Toggle selection between drawn card and free space card
+          if (freeSlot.classList.contains('active')) {
+            // Switch selection to drawn card
+            freeSlot.classList.remove('active');
+            drawnCard.classList.add('active');
+          } else {
+            // Switch selection to free space card
+            drawnCard.classList.remove('active');
+            freeSlot.classList.add('active');
+          }
+        }
+      });
+      
+      // Add click handler for free space slot
+      freeSlot.addEventListener('click', () => {
+        if (drawnCardValue && !freeSlot.dataset.filled) {
+          // Place the drawn card in free space
+          freeSlot.innerHTML = '';
+          const img = document.createElement('img');
+          img.src = `cards/${drawnCardValue}.png`;
+          img.alt = drawnCardValue;
+          freeSlot.appendChild(img);
+          freeSlot.classList.add('filled');
+          freeSpaceCard = drawnCardValue;
+          freeSlot.dataset.filled = "true";
+          drawnCard.src = 'cards/back.png';
+          drawnCard.alt = 'Card Back';
+          drawnCardValue = null;
+          
+          // Remove active class from drawn card and add to free space
+          drawnCard.classList.remove('active');
+          freeSlot.classList.add('active');
+          
+          // Draw a new card after placing in free space
+          const maxCards = freeSpaceButton && freeSpaceButton.classList.contains('active') ? 6 : 5;
+          if (!window.numericalGameOver && drawCount < maxCards) {
+            setTimeout(() => {
+              drawNewCard();
+            }, 200);
+          }
+        } else if (freeSpaceCard && !drawnCardValue) {
+          // Pick up card from free space
+          drawnCardValue = freeSpaceCard;
+          drawnCard.src = `cards/${freeSpaceCard}.png`;
+          drawnCard.alt = freeSpaceCard;
+          freeSpaceCard = null;
+          freeSlot.innerHTML = '<span class="slot-number">FREE</span>';
+          freeSlot.classList.remove('filled');
+          freeSlot.dataset.filled = '';
+          
+          // Remove active class from free space and add to drawn card
+          freeSlot.classList.remove('active');
+          drawnCard.classList.add('active');
+        } else if (freeSpaceCard && !drawnCardValue && !freeSlot.classList.contains('active')) {
+          // If free space has a card and no drawn card, and free space is not active, make it active
+          freeSlot.classList.add('active');
+        } else if (freeSpaceCard && drawnCardValue) {
+          // Toggle selection between drawn card and free space card
+          if (drawnCard.classList.contains('active')) {
+            // Switch selection to free space card
+            drawnCard.classList.remove('active');
+            freeSlot.classList.add('active');
+          } else {
+            // Switch selection to drawn card
+            freeSlot.classList.remove('active');
+            drawnCard.classList.add('active');
+          }
+        }
+      });
+    }
+  }
+});
