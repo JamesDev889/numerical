@@ -29,15 +29,26 @@
   background: rgb(192, 192, 192);
 }
 
-/* Touch device button feedback */
+/* Disable hover effects on touch devices */
+@media (pointer: coarse) {
+  #draw-button:hover,
+  #new-game-button:hover,
+  #free-space-button:hover {
+    background: white !important;
+  }
+}
+
+/* Touch device button feedback - gray for 100ms after click */
 @media (pointer: coarse) {
   #draw-button.touch-feedback,
   #new-game-button.touch-feedback,
   #free-space-button.touch-feedback {
     background: rgb(192, 192, 192) !important;
-    transition: background 1s ease !important;
+    transition: background 0.1s ease !important;
   }
 }
+
+
 
 /* Touch device button sizing */
 @media (pointer: coarse) {
