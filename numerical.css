@@ -211,6 +211,29 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
     margin: 0 0 30px 0;
 }
 
+/* Desktop-only: force 2 lines */
+@media (pointer: fine) and (min-width: 821px) {
+    #game-description {
+        font-size: 0;
+        line-height: 0;
+    }
+    
+    #game-description::before {
+        content: "The goal of the game is to place 5 cards in numerical order.";
+        font-size: 1.5rem;
+        line-height: 1.2;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    #game-description::after {
+        content: "Removing the free space makes the game more difficult.";
+        font-size: 1.5rem;
+        line-height: 1.2;
+        display: block;
+    }
+}
+
 
 
 body {
