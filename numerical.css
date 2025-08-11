@@ -29,6 +29,16 @@
   background: rgb(192, 192, 192);
 }
 
+/* Touch device button feedback */
+@media (pointer: coarse) {
+  #draw-button.touch-feedback,
+  #new-game-button.touch-feedback,
+  #free-space-button.touch-feedback {
+    background: rgb(192, 192, 192) !important;
+    transition: background 1s ease !important;
+  }
+}
+
 /* Touch device button sizing */
 @media (pointer: coarse) {
   #draw-button,
@@ -39,6 +49,36 @@
     padding: 8px 0 !important; /* Double the padding from 4px */
     height: auto !important;
     min-height: 60px !important; /* Ensure minimum height for touch targets */
+  }
+  
+  /* Touch device slot sizing */
+  .slot, #drawn-card {
+    width: 240px !important; /* Double the width from 120px */
+    height: 336px !important; /* Double the height from 168px */
+  }
+  
+  /* Touch device free space slot sizing */
+  #free-space-slot,
+  .free-slot {
+    width: 240px !important; /* Double the width from 120px */
+    height: 336px !important; /* Double the height from 168px */
+  }
+  
+  /* Touch device slot number sizing */
+  .slot-number {
+    font-size: 128px !important; /* Double the font size from 64px */
+  }
+  
+  /* Touch device free space text sizing */
+  .free-slot .slot-number {
+    font-size: 64px !important; /* Double the font size from 32px */
+  }
+  
+  /* Touch device filled slot image sizing */
+  .slot.filled img,
+  .free-slot.filled img {
+    width: 240px !important; /* Double the width from 120px */
+    height: 336px !important; /* Double the height from 168px */
   }
 }
 

@@ -811,4 +811,20 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   }
+  
+  // Add touch feedback for buttons on touch devices
+  if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+    const buttons = [freeSpaceButton, newGameButton];
+    
+    buttons.forEach(button => {
+      if (button) {
+        button.addEventListener('touchstart', () => {
+          button.classList.add('touch-feedback');
+          setTimeout(() => {
+            button.classList.remove('touch-feedback');
+          }, 1000);
+        });
+      }
+    });
+  }
 });
