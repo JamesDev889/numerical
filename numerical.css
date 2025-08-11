@@ -29,6 +29,17 @@
   background: rgb(192, 192, 192);
 }
 
+/* Touch device button sizing */
+@media (pointer: coarse) {
+  #draw-button,
+  #new-game-button,
+  #free-space-button {
+    width: 300px; /* Double the width from 150px */
+    font-size: 3rem; /* Double the font size from 1.5rem */
+    padding: 8px 0; /* Double the padding from 4px */
+  }
+}
+
 /* Card slot images default size */
 
 /* All card images (slot and drawn) at 50% size */
