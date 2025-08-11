@@ -87,11 +87,15 @@
   }
   
   #game-description {
+    max-width: 800px !important; /* Set width to wrap to 3 lines */
+    margin: 0 auto 30px auto !important;
     font-size: 2.25rem !important; /* 1.5x larger than 1.5rem */
+    white-space: nowrap !important; /* Prevent any text wrapping */
   }
   
   #message, #high-score {
     font-size: 3rem !important; /* 1.5x larger than 2rem */
+    white-space: nowrap !important; /* Prevent text wrapping */
   }
 }
 
@@ -401,6 +405,36 @@ body {
         grid-template-rows: repeat(2, auto);
         gap: 30px;
         row-gap: 30px; /* Same spacing between rows as between drawn card and slots */
+    }
+    
+    /* Landscape mode on touch devices - put all slots on one line */
+    @media (pointer: coarse) and (orientation: landscape) {
+        #slots-area {
+            grid-template-columns: repeat(5, 160px) !important;
+            grid-template-rows: 1fr !important;
+            gap: 30px !important;
+        }
+        
+        #slots-area .slot:nth-child(1) {
+            grid-column: 1 !important;
+            grid-row: 1 !important;
+        }
+        #slots-area .slot:nth-child(2) {
+            grid-column: 2 !important;
+            grid-row: 1 !important;
+        }
+        #slots-area .slot:nth-child(3) {
+            grid-column: 3 !important;
+            grid-row: 1 !important;
+        }
+        #slots-area .slot:nth-child(4) {
+            grid-column: 4 !important;
+            grid-row: 1 !important;
+        }
+        #slots-area .slot:nth-child(5) {
+            grid-column: 5 !important;
+            grid-row: 1 !important;
+        }
     }
     #slots-area .slot:nth-child(1) {
         grid-column: 1 / 3;
