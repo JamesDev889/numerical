@@ -34,9 +34,11 @@
   #draw-button,
   #new-game-button,
   #free-space-button {
-    width: 300px; /* Double the width from 150px */
-    font-size: 3rem; /* Double the font size from 1.5rem */
-    padding: 8px 0; /* Double the padding from 4px */
+    width: 300px !important; /* Double the width from 150px */
+    font-size: 3rem !important; /* Double the font size from 1.5rem */
+    padding: 8px 0 !important; /* Double the padding from 4px */
+    height: auto !important;
+    min-height: 60px !important; /* Ensure minimum height for touch targets */
   }
 }
 
