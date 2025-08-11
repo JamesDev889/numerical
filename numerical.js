@@ -14,23 +14,18 @@ freeSpaceButton.addEventListener('click', () => {
   });
 
   drawnCard.src = 'cards/back.png';
-  //drawnCard.alt = 'Card Back';
   drawnCardValue = null;
-  // Reset placed cards and draw count
-  placedCards = [null, null, null, null, null];
-  freeSpaceCard = null;
-  // Reset streak/message
-  if (typeof totalPoints !== 'undefined') totalPoints = 0;
-  if (message) {
-    message.innerHTML = '<span style="color:#ff8500;">Current Streak:</span> <span style="color:white;">0</span>';
-  }
-  // Clear high score
-  if (typeof highScore !== 'undefined') highScore = 0;
-  if (highScoreEl) {
-    highScoreEl.innerHTML = `<span style=\"color:#4a8ff0;\">High Score:</span> <span style=\"color:white;\">0</span>`;
-  }
+  
+  //placedCards = [null, null, null, null, null];
+  //freeSpaceCard = null;
+ 
+  totalPoints = 0;
+  message.innerHTML = '<span style="color:#ff8500;">Current Streak:</span> <span style="color:white;">0</span>';
 
-  // Toggle green free space slot next to the drawn card
+  highScore = 0;
+  highScoreEl.innerHTML = `<span style=\"color:#4a8ff0;\">High Score:</span> <span style=\"color:white;\">0</span>`;
+
+
   const cardArea = document.getElementById('card-area');
   const existingFreeSlot = document.getElementById('free-space-slot');
     if (freeSpaceButton.classList.contains('active')) {
@@ -83,7 +78,7 @@ freeSpaceButton.addEventListener('click', () => {
       }
   });
 
-// The deck of cards, one for each suit and rank
+// The deck of cards, one for each suit and rank, plus jokers
 const deck = [
   // Hearts
   '2H', '3H', '4H', '5H', '6H', '7H', '8H', '9H', '10H', 'JH', 'QH', 'KH', 'AH',
@@ -92,7 +87,9 @@ const deck = [
   // Clubs
   '2C', '3C', '4C', '5C', '6C', '7C', '8C', '9C', '10C', 'JC', 'QC', 'KC', 'AC',
   // Spades
-  '2S', '3S', '4S', '5S', '6S', '7S', '8S', '9S', '10S', 'JS', 'QS', 'KS', 'AS'
+  '2S', '3S', '4S', '5S', '6S', '7S', '8S', '9S', '10S', 'JS', 'QS', 'KS', 'AS',
+  // Jokers
+  'JB', 'JR'
 ];
 
 /**
@@ -110,7 +107,7 @@ function shuffleArray(array) {
 }
 
 /**
- * Refill the deck to a full 52-card set and shuffle it.
+ * Refill the deck to a full 54-card set (52 regular + 2 jokers) and shuffle it.
  * Called on first load, New Game, and after each successful round.
  */
 function refillAndShuffleDeck() {
@@ -123,13 +120,15 @@ function refillAndShuffleDeck() {
     // Clubs
     '2C', '3C', '4C', '5C', '6C', '7C', '8C', '9C', '10C', 'JC', 'QC', 'KC', 'AC',
     // Spades
-    '2S', '3S', '4S', '5S', '6S', '7S', '8S', '9S', '10S', 'JS', 'QS', 'KS', 'AS'
+    '2S', '3S', '4S', '5S', '6S', '7S', '8S', '9S', '10S', 'JS', 'QS', 'KS', 'AS',
+    // Jokers
+    'JB', 'JR'
   );
   shuffleArray(deck);
 }
 
 /**
- * Refill the deck to a full 52-card set excluding the free space card, and shuffle it.
+ * Refill the deck to a full 54-card set (52 regular + 2 jokers) excluding the free space card, and shuffle it.
  * Called after each successful round when free space is enabled.
  */
 function refillAndShuffleDeckExcludingFreeSpace() {
@@ -142,7 +141,9 @@ function refillAndShuffleDeckExcludingFreeSpace() {
     // Clubs
     '2C', '3C', '4C', '5C', '6C', '7C', '8C', '9C', '10C', 'JC', 'QC', 'KC', 'AC',
     // Spades
-    '2S', '3S', '4S', '5S', '6S', '7S', '8S', '9S', '10S', 'JS', 'QS', 'KS', 'AS'
+    '2S', '3S', '4S', '5S', '6S', '7S', '8S', '9S', '10S', 'JS', 'QS', 'KS', 'AS',
+    // Jokers
+    'JB', 'JR'
   );
   
   // Remove the free space card from the deck if it exists
@@ -251,10 +252,17 @@ if (highScoreEl) {
 /**
  * Converts a card string (e.g., 'AH', '10D') to its numeric value.
  * Returns an array for Ace ([1, 14]) to support both low and high.
+ * Jokers return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14] to represent any value.
  * @param {string} card
  * @returns {number|number[]}
  */
 function getCardValue(card) {
+  // Check if it's a joker first
+  if (card === 'JB' || card === 'JR') {
+    // Jokers can be any value from 1 to 14
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+  }
+  
   // Extract rank from card string (e.g., '2H' -> '2', '10H' -> '10', 'JH' -> 'J')
   let rank;
   if (card.startsWith('10')) {
@@ -362,6 +370,11 @@ function getAllValueCombos(values) {
  * @returns {boolean}
  */
 function canPlaceCardAnywhere(card) {
+  // Jokers can always be placed anywhere
+  if (card === 'JB' || card === 'JR') {
+    return true;
+  }
+  
   // Check if card can be placed in any regular slot
   for (let i = 0; i < placedCards.length; i++) {
     if (placedCards[i] !== null) continue;
@@ -400,6 +413,11 @@ function canGameContinue() {
  * Checks if a card can be placed in any regular slot (not including free space).
  */
 function canPlaceInRegularSlots(card) {
+  // Jokers can always be placed in any regular slot
+  if (card === 'JB' || card === 'JR') {
+    return true;
+  }
+  
   for (let i = 0; i < placedCards.length; i++) {
     if (placedCards[i] !== null) continue;
     const hypothetical = placedCards.slice();
@@ -639,8 +657,16 @@ slots.forEach((slot, index) => {
       // Check if the game is still winnable after this placement
       let stillPossible = false;
       const filledValues = placedCards.filter(c => c !== null).map(getCardValue);
-      const combos = getAllValueCombos(filledValues);
-      stillPossible = combos.some(arr => arr.every((val, idx) => idx === 0 || arr[idx] >= arr[idx - 1]));
+      
+      // If there are jokers, the game is always winnable
+      const hasJokers = placedCards.some(card => card === 'JB' || card === 'JR');
+      if (hasJokers) {
+        stillPossible = true;
+      } else {
+        const combos = getAllValueCombos(filledValues);
+        stillPossible = combos.some(arr => arr.every((val, idx) => idx === 0 || arr[idx] >= arr[idx - 1]));
+      }
+      
       if (!stillPossible) {
         message.innerHTML = `<span style="color:red;">Game Over</span> <span style="color:white;">|</span> <span style="color:limegreen;">Final Score:</span> <span style="color:white;">${totalPoints}</span>`;
         const allSlots = document.querySelectorAll('.slot');
