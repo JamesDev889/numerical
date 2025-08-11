@@ -601,14 +601,7 @@ function drawNewCard() {
   drawnCard.alt = selectedCard;
   drawnCardValue = selectedCard;
   
-  // Only add active class if free space is enabled
-  if (freeSpaceButton && freeSpaceButton.classList.contains('active')) {
-    drawnCard.classList.add('active');
-    const freeSlot = document.getElementById('free-space-slot');
-    if (freeSlot) {
-      freeSlot.classList.remove('active');
-    }
-  }
+  // Do not toggle selection; drawn card is always the active one by logic
   
   // Check if game can continue with current cards
   if (!canGameContinue()) {
@@ -632,10 +625,8 @@ function drawNewCard() {
 const slots = document.querySelectorAll('.slot');
 slots.forEach((slot, index) => {
   slot.addEventListener('click', () => {
-    // Place drawn card if it's the active card or if free space is not enabled
-    const freeSpaceEnabled = freeSpaceButton && freeSpaceButton.classList.contains('active');
-    const canPlaceDrawnCard = drawnCardValue && !slot.dataset.filled && 
-                              (!freeSpaceEnabled || drawnCard.classList.contains('active'));
+    // Place drawn card if slot is empty (no selection toggling)
+    const canPlaceDrawnCard = drawnCardValue && !slot.dataset.filled;
     
     if (canPlaceDrawnCard) {
       // Place the drawn card in clicked slot
@@ -650,7 +641,6 @@ slots.forEach((slot, index) => {
       drawnCard.src = 'cards/back.png';
       drawnCard.alt = 'Card Back';
       drawnCardValue = null;
-      drawnCard.classList.remove('active');
       slot.style.pointerEvents = 'none';
       
       // Check if the game is still winnable after this placement
