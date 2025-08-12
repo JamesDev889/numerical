@@ -577,7 +577,21 @@ body {
 
 /* Touch landscape: place slots up to the right of the free card (single row layout) */
 @media (pointer: coarse) and (orientation: landscape) {
+  /* Allow full-page horizontal scroll and natural layout on touch landscape */
+  html, body {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+  }
+
   .game-container {
+    position: static !important;
+    left: auto !important;
+    transform: none !important;
+    width: max-content !important;
+    margin: 20px auto 0 auto !important;
     display: grid;
     grid-template-columns: 360px auto;
     grid-template-areas:
@@ -589,11 +603,12 @@ body {
     row-gap: 20px;
     justify-content: center;
     align-items: start;
+    justify-items: center; /* center grid items spanning both columns */
   }
 
-  #game-title { grid-area: title; }
-  #game-description { grid-area: desc; }
-  #button-area { grid-area: buttons; }
+  #game-title { grid-area: title; justify-self: center; }
+  #game-description { grid-area: desc; justify-self: center; }
+  #button-area { grid-area: buttons; justify-self: center; }
   #card-area { grid-area: cards; margin-bottom: 0 !important; }
   #slots-area { grid-area: slots; margin-top: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }
 
