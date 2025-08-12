@@ -575,6 +575,49 @@ body {
   }
 }
 
+/* Touch landscape: place slots up to the right of the free card (single row layout) */
+@media (pointer: coarse) and (orientation: landscape) {
+  .game-container {
+    display: grid;
+    grid-template-columns: 360px auto;
+    grid-template-areas:
+      "title title"
+      "desc desc"
+      "buttons buttons"
+      "cards slots";
+    column-gap: 30px;
+    row-gap: 20px;
+    justify-content: center;
+    align-items: start;
+  }
+
+  #game-title { grid-area: title; }
+  #game-description { grid-area: desc; }
+  #button-area { grid-area: buttons; }
+  #card-area { grid-area: cards; margin-bottom: 0 !important; }
+  #slots-area { grid-area: slots; margin-top: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }
+
+  /* Drawn card and free slot side-by-side */
+  #card-area {
+    grid-template-columns: 160px 160px !important;
+    grid-template-rows: 1fr !important;
+    gap: 30px !important;
+  }
+  #card-area img { grid-column: 1 !important; }
+  #drawn-card + #free-space-slot,
+  #drawn-card + .free-slot { grid-column: 2 !important; }
+
+  /* Five slots to the right on the same row */
+  #slots-area {
+    grid-template-columns: repeat(5, 160px) !important;
+    grid-template-rows: 1fr !important;
+    gap: 30px !important;
+    justify-content: center !important;
+    justify-items: center !important;
+    justify-self: center;
+  }
+}
+
 /* Touch devices in portrait: prevent text from wrapping to new lines */
 @media (pointer: coarse) and (orientation: portrait) {
   /* Allow wrapping ONLY at the split after the word "place" */
