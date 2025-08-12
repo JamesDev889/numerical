@@ -575,18 +575,17 @@ slots.forEach((slot, index) => {
       drawnCardValue = null;
       slot.style.pointerEvents = 'none';
       
-      // Check if the game is still winnable after this placement
+      // Check if the game is still winnable after this placement.
+      // Jokers are treated as flexible values by getCardValue + getAllValueCombos,
+      // so we do not special-case them here.
       let stillPossible = false;
-      const filledValues = placedCards.filter(c => c !== null).map(getCardValue);
-      
-      // If there are jokers, the game is always winnable
-      const hasJokers = placedCards.some(card => card === 'JB' || card === 'JR');
-      if (hasJokers) {
-        stillPossible = true;
-      } else {
-        const combos = getAllValueCombos(filledValues);
-        stillPossible = combos.some(arr => arr.every((val, idx) => idx === 0 || arr[idx] >= arr[idx - 1]));
-      }
+      const filledValues = placedCards
+        .filter(c => c !== null)
+        .map(getCardValue);
+      const combos = getAllValueCombos(filledValues);
+      stillPossible = combos.some(arr =>
+        arr.every((val, idx) => idx === 0 || arr[idx] >= arr[idx - 1])
+      );
       
       if (!stillPossible) {
         message.innerHTML = `<span style="color:red;">Game Over</span> <span style="color:white;">|</span> <span style="color:limegreen;">Final Score:</span> <span style="color:white;">${totalPoints}</span>`;
