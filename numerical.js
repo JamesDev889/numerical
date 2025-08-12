@@ -668,7 +668,7 @@ document.addEventListener('DOMContentLoaded', () => {
           button.classList.add('touch-feedback');
           setTimeout(() => {
             button.classList.remove('touch-feedback');
-          }, 150);
+          }, 200);
         });
       }
     });
