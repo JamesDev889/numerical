@@ -220,8 +220,6 @@ if (message) {
 function animateCardsBackToDeck(slotsEls) {
   return new Promise(resolveOuter => {
     const deckTarget = drawnCard.getBoundingClientRect();
-    const scrollX = window.scrollX;
-    const scrollY = window.scrollY;
 
     const flyPromises = [];
 
@@ -231,8 +229,9 @@ function animateCardsBackToDeck(slotsEls) {
       const rect = img.getBoundingClientRect();
       const clone = img.cloneNode(true);
       clone.classList.add('flying-card');
-      clone.style.left = `${rect.left + scrollX}px`;
-      clone.style.top = `${rect.top + scrollY}px`;
+      // Use viewport coordinates for fixed-position clone
+      clone.style.left = `${rect.left}px`;
+      clone.style.top = `${rect.top}px`;
       clone.style.transform = 'translate(0, 0)';
       clone.style.opacity = '1';
       document.body.appendChild(clone);
@@ -240,8 +239,8 @@ function animateCardsBackToDeck(slotsEls) {
       // Force reflow then move towards deck
       // eslint-disable-next-line no-unused-expressions
       clone.offsetHeight;
-      const dx = deckTarget.left - rect.left;
-      const dy = deckTarget.top - rect.top;
+        const dx = deckTarget.left - rect.left;
+        const dy = deckTarget.top - rect.top;
       requestAnimationFrame(() => {
         clone.style.transform = `translate(${dx}px, ${dy}px) scale(0.6)`;
         clone.style.opacity = '0';
@@ -393,8 +392,6 @@ function checkForWin() {
 
         // Animate cards flying back to the deck position (drawn card location)
         const deckTarget = drawnCard.getBoundingClientRect();
-        const containerScrollX = window.scrollX;
-        const containerScrollY = window.scrollY;
 
         // Create flying clones from each filled slot image and free space card
         const flyPromises = [];
@@ -406,8 +403,9 @@ function checkForWin() {
           const rect = img.getBoundingClientRect();
           const clone = img.cloneNode(true);
           clone.classList.add('flying-card');
-          clone.style.left = `${rect.left + containerScrollX}px`;
-          clone.style.top = `${rect.top + containerScrollY}px`;
+          // Use viewport coordinates for fixed-position clone
+          clone.style.left = `${rect.left}px`;
+          clone.style.top = `${rect.top}px`;
           clone.style.transform = 'translate(0, 0)';
           clone.style.opacity = '1';
           document.body.appendChild(clone);
@@ -438,8 +436,9 @@ function checkForWin() {
             const rect = img.getBoundingClientRect();
             const clone = img.cloneNode(true);
             clone.classList.add('flying-card');
-            clone.style.left = `${rect.left + containerScrollX}px`;
-            clone.style.top = `${rect.top + containerScrollY}px`;
+            // Use viewport coordinates for fixed-position clone
+            clone.style.left = `${rect.left}px`;
+            clone.style.top = `${rect.top}px`;
             clone.style.transform = 'translate(0, 0)';
             clone.style.opacity = '1';
             document.body.appendChild(clone);
