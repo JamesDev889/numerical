@@ -574,3 +574,19 @@ body {
     padding-right: 100px;
   }
 }
+
+/* Touch devices in portrait: prevent text from wrapping to new lines */
+@media (pointer: coarse) and (orientation: portrait) {
+  /* Allow wrapping ONLY at the split after the word "place" */
+  #game-description {
+    white-space: normal !important;
+  }
+  #game-description .gd-part1,
+  #game-description .gd-part2 {
+    white-space: nowrap !important;
+  }
+  #message,
+  #high-score {
+    white-space: nowrap !important;
+  }
+}
