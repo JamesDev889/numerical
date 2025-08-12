@@ -1,11 +1,6 @@
 /* Numerical css*/
-#free-space-button.active {
-  outline: 4px solid #1ec94c;
-  outline-offset: 0;
-}
 #draw-button,
-#new-game-button,
-#free-space-button {
+#new-game-button {
   font-family: Arial;
   font-size: 1.5rem;
   font-weight: bold;
@@ -26,16 +21,14 @@
 }
 
 #draw-button:hover,
-#new-game-button:hover,
-#free-space-button:hover {
+#new-game-button:hover {
   background: rgb(192, 192, 192);
 }
 
 /* Disable hover effects on touch devices */
 @media (pointer: coarse) {
   #draw-button:hover,
-  #new-game-button:hover,
-  #free-space-button:hover {
+  #new-game-button:hover {
     background: white !important;
   }
 }
@@ -43,8 +36,7 @@
 /* Touch device button feedback - gray for 150ms after click */
 @media (pointer: coarse) {
   #draw-button.touch-feedback,
-  #new-game-button.touch-feedback,
-  #free-space-button.touch-feedback {
+  #new-game-button.touch-feedback {
     background: rgb(192, 192, 192) !important;
     transition: background 0.15s ease !important;
   }
@@ -55,8 +47,7 @@
 /* Touch device button sizing */
 @media (pointer: coarse) {
   #draw-button,
-  #new-game-button,
-  #free-space-button {
+  #new-game-button {
     width: 200px !important; /* 1.5x smaller than 300px */
     font-size: 2.25rem !important; /* 1.5x smaller than 3rem */
     padding: 6px 0 !important; /* 1.5x smaller than 8px */
@@ -100,10 +91,14 @@
   }
   
   #game-description {
-    max-width: 800px !important; /* Set width to wrap to 3 lines */
-    margin: 0 auto 30px auto !important;
-    font-size: 2.25rem !important; /* 1.5x larger than 1.5rem */
-    white-space: nowrap !important; /* Prevent any text wrapping */
+    max-width: 80ch !important; /* Very wide to force 2 lines */
+    margin: 0 auto 30px auto !important; /* Center and spacing */
+    font-size: 2.25rem !important; /* 1.5x the base 1.5rem on touch devices */
+    line-height: 1.2 !important;
+    white-space: normal !important; /* Allow wrapping */
+    text-wrap: none !important; /* Disable balance wrapping */
+    word-break: keep-all !important;
+    hyphens: none !important;
   }
   
   #message, #high-score {
@@ -227,26 +222,11 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
     margin: 0 0 30px 0;
 }
 
-/* Desktop-only: force 2 lines */
+/* Desktop-only: use the HTML content directly; no pseudo-elements */
 @media (pointer: fine) and (min-width: 821px) {
     #game-description {
-        font-size: 0;
-        line-height: 0;
-    }
-    
-    #game-description::before {
-        content: "The goal of the game is to place 5 cards in numerical order.";
         font-size: 1.5rem;
         line-height: 1.2;
-        display: block;
-        margin-bottom: 0.5rem;
-    }
-    
-    #game-description::after {
-        content: "Removing the free space makes the game more difficult.";
-        font-size: 1.5rem;
-        line-height: 1.2;
-        display: block;
     }
 }
 
@@ -431,8 +411,11 @@ body {
         grid-row: 2;
     }
     #game-description {
-        max-width: 400px;
-        margin: 0 auto 30px auto;
+        max-width: none !important;
+        margin: 0 auto 30px auto !important;
+        font-size: 2.25rem !important;
+        line-height: 1.2 !important;
+        white-space: nowrap !important;
     }
 }
 
@@ -499,8 +482,14 @@ body {
         grid-row: 2;
     }
     #game-description {
-        max-width: 400px;
-        margin: 0 auto 30px auto;
+        max-width: 80ch !important; /* Very wide to force 2 lines */
+        margin: 0 auto 30px auto !important; /* Center and spacing */
+        font-size: 2.25rem !important; /* 1.5x the base 1.5rem on touch devices */
+        line-height: 1.2 !important;
+        white-space: normal !important; /* Allow wrapping */
+        text-wrap: none !important; /* Disable balance wrapping */
+        word-break: keep-all !important;
+        hyphens: none !important;
     }
 }
 

@@ -1,83 +1,5 @@
 // Numerical js
 
-const freeSpaceButton = document.getElementById('free-space-button');
-// When the free spcace button is clicked, toggle green on/off button border, reset the slots, free space, and draw card, 
-freeSpaceButton.addEventListener('click', () => {
-  // Toggles a css rule for the green border on the free space button
-  freeSpaceButton.classList.toggle('active');
-  // Creates a nodelist for all 5 slots
-  const slots = document.querySelectorAll('.slot');
-  // Calls the function once per slot
-  slots.forEach((slot, i) => {
-    // Replaces any card images on slots with html text of each slot number
-    slot.innerHTML = `<span class="slot-number">${i + 1}</span>`;
-  });
-
-  drawnCard.src = 'cards/back.png';
-  drawnCardValue = null;
-  
-  //placedCards = [null, null, null, null, null];
-  //freeSpaceCard = null;
- 
-  totalPoints = 0;
-  message.innerHTML = '<span style="color:#ff8500;">Current Streak:</span> <span style="color:white;">0</span>';
-
-  highScore = 0;
-  highScoreEl.innerHTML = `<span style=\"color:#4a8ff0;\">High Score:</span> <span style=\"color:white;\">0</span>`;
-
-
-  const cardArea = document.getElementById('card-area');
-  const existingFreeSlot = document.getElementById('free-space-slot');
-    if (freeSpaceButton.classList.contains('active')) {
-      if (!existingFreeSlot && cardArea) {
-        const freeSlot = document.createElement('div');
-        freeSlot.id = 'free-space-slot';
-        freeSlot.className = 'free-slot';
-        freeSlot.innerHTML = '<span class="slot-number">FREE</span>';
-        cardArea.appendChild(freeSlot);
-        
-        // Add click handler for drawn card (no toggle behavior)
-        drawnCard.addEventListener('click', () => {
-          // Do nothing; drawn card remains the selected card
-        });
-        
-        // Add click handler for free space slot
-        freeSlot.addEventListener('click', () => {
-          if (drawnCardValue && !freeSlot.dataset.filled) {
-            // Place the drawn card in free space
-            freeSlot.innerHTML = '';
-            const img = document.createElement('img');
-            img.src = `cards/${drawnCardValue}.png`;
-            img.alt = drawnCardValue;
-            freeSlot.appendChild(img);
-            freeSlot.classList.add('filled');
-            freeSpaceCard = drawnCardValue;
-            freeSlot.dataset.filled = "true";
-            drawnCard.src = 'cards/back.png';
-            drawnCard.alt = 'Card Back';
-            drawnCardValue = null;
-            
-            // Draw a new card after placing in free space
-            if (!window.numericalGameOver) {
-              setTimeout(() => {
-                drawNewCard();
-              }, 200);
-            }
-          }
-        });
-              }
-      } else if (existingFreeSlot) {
-        // Return card to deck if free space is being removed
-        if (freeSpaceCard) {
-          freeSpaceCard = null;
-        }
-        existingFreeSlot.remove();
-        
-        // Remove active class from drawn card when free space is disabled
-        drawnCard.classList.remove('active');
-      }
-  });
-
 // The deck of cards, one for each suit and rank, plus jokers
 const deck = [
   // Hearts
@@ -388,8 +310,8 @@ function canPlaceCardAnywhere(card) {
     if (feasible) return true;
   }
   
-  // If free space is enabled and empty, card can always be placed there
-  if (freeSpaceButton && freeSpaceButton.classList.contains('active') && !freeSpaceCard) {
+  // If free space is empty, card can always be placed there
+  if (!freeSpaceCard) {
     return true;
   }
   
@@ -685,33 +607,18 @@ slots.forEach((slot, index) => {
   });
 });
 
-// Initialize free space on page load if button is active
+// Initialize free space on page load (always present)
 document.addEventListener('DOMContentLoaded', () => {
-  if (freeSpaceButton && freeSpaceButton.classList.contains('active')) {
-    // Create the free space slot
-    const cardArea = document.getElementById('card-area');
-    if (cardArea) {
-      const freeSlot = document.createElement('div');
-      freeSlot.id = 'free-space-slot';
-      freeSlot.className = 'free-slot';
-      freeSlot.innerHTML = '<span class="slot-number">FREE</span>';
-      cardArea.appendChild(freeSlot);
+  // Create the free space slot
+  const cardArea = document.getElementById('card-area');
+  if (cardArea && !document.getElementById('free-space-slot')) {
+    const freeSlot = document.createElement('div');
+    freeSlot.id = 'free-space-slot';
+    freeSlot.className = 'free-slot';
+    freeSlot.innerHTML = '<span class="slot-number">FREE</span>';
+    cardArea.appendChild(freeSlot);
       
-      // Add click handler for drawn card to toggle selection
-      drawnCard.addEventListener('click', () => {
-        if (freeSpaceCard && drawnCardValue) {
-          // Toggle selection between drawn card and free space card
-          if (freeSlot.classList.contains('active')) {
-            // Switch selection to drawn card
-            freeSlot.classList.remove('active');
-            drawnCard.classList.add('active');
-          } else {
-            // Switch selection to free space card
-            drawnCard.classList.remove('active');
-            freeSlot.classList.add('active');
-          }
-        }
-      });
+      // No drawn-card toggle logic needed when free space is always present
       
       // Add click handler for free space slot
       freeSlot.addEventListener('click', () => {
@@ -729,9 +636,7 @@ document.addEventListener('DOMContentLoaded', () => {
           drawnCard.alt = 'Card Back';
           drawnCardValue = null;
           
-          // Remove active class from drawn card and add to free space
-          drawnCard.classList.remove('active');
-          freeSlot.classList.add('active');
+          // No active toggling needed
           
           // Draw a new card after placing in free space
           if (!window.numericalGameOver) {
@@ -748,32 +653,14 @@ document.addEventListener('DOMContentLoaded', () => {
           freeSlot.innerHTML = '<span class="slot-number">FREE</span>';
           freeSlot.classList.remove('filled');
           freeSlot.dataset.filled = '';
-          
-          // Remove active class from free space and add to drawn card
-          freeSlot.classList.remove('active');
-          drawnCard.classList.add('active');
-        } else if (freeSpaceCard && !drawnCardValue && !freeSlot.classList.contains('active')) {
-          // If free space has a card and no drawn card, and free space is not active, make it active
-          freeSlot.classList.add('active');
-        } else if (freeSpaceCard && drawnCardValue) {
-          // Toggle selection between drawn card and free space card
-          if (drawnCard.classList.contains('active')) {
-            // Switch selection to free space card
-            drawnCard.classList.remove('active');
-            freeSlot.classList.add('active');
-          } else {
-            // Switch selection to drawn card
-            freeSlot.classList.remove('active');
-            drawnCard.classList.add('active');
-          }
+          // No active toggling needed
         }
       });
-    }
   }
   
   // Add touch feedback for buttons on touch devices
   if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-    const buttons = [freeSpaceButton, newGameButton];
+    const buttons = [newGameButton];
     
     buttons.forEach(button => {
       if (button) {
