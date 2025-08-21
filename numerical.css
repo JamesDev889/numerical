@@ -111,11 +111,12 @@ body {
     background-color: #e8f5e8;
     color: #15c215;
     border-color: #15c215;
+    
 }
 
 #drawSlot {
     border-color: rgb(153, 11, 255);
-    background-color: #e9d9ff;
+    background-color: #ecdfff;
 }
 
 button {
