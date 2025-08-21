@@ -7,6 +7,7 @@ const fullDeck = ['2C','3C','4C','5C','6C','7C','8C','9C','10C','JC','QC','KC','
 let deck = ['2C','3C','4C','5C','6C','7C','8C','9C','10C','JC','QC','KC','AC','2D','3D','4D','5D','6D','7D','8D','9D','10D','JD','QD','KD','AD','2H','3H','4H','5H','6H','7H','8H','9H','10H','JH','QH','KH','AH','2S','3S','4S','5S','6S','7S','8S','9S','10S','JS','QS','KS','AS','JB','JR'];
 let highScore = 0;
 let score = 0;
+let gameOverTimeout = null; // Store timeout ID to cancel it if needed
 
 
 // when the user clicks new game current streak is set to 0, the deck is shuffled,
@@ -24,6 +25,11 @@ document.getElementById('endlessBtn').onclick = () => {
 // Game starts with back card - no automatic start
 
 function startNewGame() {
+    // Cancel any existing timeout if manual new game is clicked
+    if (gameOverTimeout) {
+        clearTimeout(gameOverTimeout);
+    }
+    
     //resets score
     score = 0;
     document.querySelector('.score').innerHTML = `<span class="score-label">Score:</span> <span class="score-value">${score}</span>`;
@@ -128,11 +134,11 @@ function checkPlaceLoss() {
         drawSlot.innerHTML = `<img src="cards/back.png" style="width:100%;height:100%;object-fit:cover;" />`;
         showGameOver();
         if (document.getElementById('endlessBtn').classList.contains('toggled')) {
-            // Endless mode: start new game instead of game over
-            setTimeout(() => {
+            // Endless mode: delay then start new game so user can see the card they lost to
+            gameOverTimeout = setTimeout(() => {
                 startNewGame();
             }, 2000);
-            return true; // Game is over (but new game started)
+            return true; // Game is over (but new game will start after delay)
         } else {
             
             return true; // Game is over
@@ -176,7 +182,7 @@ function checkDrawLoss() {
     // Check if endless mode is toggled
     if (document.getElementById('endlessBtn').classList.contains('toggled')) {
         // Endless mode: delay then start new game so user can see the card they lost to
-        setTimeout(() => {
+        gameOverTimeout = setTimeout(() => {
             startNewGame();
         }, 2000); // 2 second delay
         return true; // Game is over (but new game will start after delay)
