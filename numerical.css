@@ -10,7 +10,7 @@ body {
     font-size: 48px;
 }
 
-#game-title,#game-description, #newGameButton, #high-score, #score {
+#game-title,#game-description, #newGameButton, #high-score, .score {
     margin: 20px;
 }
 
@@ -23,9 +23,37 @@ body {
     font-size: 30px;
 }
 
-#score {
-    color: rgb(255, 100, 0);
+.score {
     font-size: 30px;
+}
+
+/* Score styling classes */
+.score-label {
+    color: rgb(255, 149, 0);
+}
+
+.score-value {
+    color: white;
+}
+
+.game-over-text {
+    color: red;
+}
+
+.score-separator {
+    color: white;
+}
+
+.final-score-label {
+    color: lime;
+}
+
+.high-score-label {
+    color: #0088ff;
+}
+
+.high-score-value {
+    color: white;
 }
 
 #game-header {
@@ -68,7 +96,7 @@ body {
     }
     
     /* Make high score and score text smaller on mobile */
-    #high-score, #score {
+    #high-score, .score {
         font-size: 24px;
     }
     

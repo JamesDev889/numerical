@@ -26,7 +26,7 @@ document.getElementById('endlessBtn').onclick = () => {
 function startNewGame() {
     //resets score
     score = 0;
-    document.getElementById('score').innerHTML = `<span style="color: rgb(255, 120, 0);">Score:</span> <span style="color: white;">${score}</span>`;
+    document.querySelector('.score').innerHTML = `<span class="score-label">Score:</span> <span class="score-value">${score}</span>`;
     shuffleCards();
     drawCard();
     //sets all images in slots to original html text
@@ -34,7 +34,7 @@ function startNewGame() {
     // Re-enable slot clicks for new game
     slots.forEach(slot => slot.style.pointerEvents = 'auto');
     // Reset score display to normal
-    document.getElementById('score').innerHTML = `<span style="color: rgb(255, 120, 0);">Score:</span> <span style="color: white;">${score}</span>`;
+    document.querySelector('.score').innerHTML = `<span class="score-label">Score:</span> <span class="score-value">${score}</span>`;
 }
 
 // Fisher-Yates shuffle that refills the deck first
@@ -124,14 +124,17 @@ function checkPlaceLoss() {
     // Check if order is maintained
     if (!checkOrder()) {
         // Check if endless mode is toggled
+        // Normal mode: show game over
+        drawSlot.innerHTML = `<img src="cards/back.png" style="width:100%;height:100%;object-fit:cover;" />`;
+        showGameOver();
         if (document.getElementById('endlessBtn').classList.contains('toggled')) {
             // Endless mode: start new game instead of game over
-            startNewGame();
+            setTimeout(() => {
+                startNewGame();
+            }, 2000);
             return true; // Game is over (but new game started)
         } else {
-            // Normal mode: show game over
-            drawSlot.innerHTML = `<img src="cards/back.png" style="width:100%;height:100%;object-fit:cover;" />`;
-            showGameOver();
+            
             return true; // Game is over
         }
     }
@@ -167,23 +170,24 @@ function checkDrawLoss() {
         // Order is broken, restore and try next slot
         slots[slotIndex].innerHTML = originalContent;
     }
-    
+    slots.forEach(slot => slot.style.pointerEvents = 'none');
+    showGameOver();
     // Can't place anywhere - game over
     // Check if endless mode is toggled
     if (document.getElementById('endlessBtn').classList.contains('toggled')) {
-        // Endless mode: start new game instead of game over
-        startNewGame();
-        return true; // Game is over (but new game started)
+        // Endless mode: delay then start new game so user can see the card they lost to
+        setTimeout(() => {
+            startNewGame();
+        }, 2000); // 2 second delay
+        return true; // Game is over (but new game will start after delay)
     } else {
-        // Normal mode: show game over
-        slots.forEach(slot => slot.style.pointerEvents = 'none');
-        showGameOver();
+        
         return true; // Game is over
     }
 }
 
 function showGameOver() {
-    document.getElementById('score').innerHTML = `<span style="color: red;">Game Over</span> <span style="color: white;">|</span> <span style="color: lime;">Final Score:</span> <span style="color: white;">${score}</span>`;
+    document.querySelector('.score').innerHTML = `<span class="game-over-text">Game Over</span> <span class="score-separator">|</span> <span class="final-score-label">Final Score:</span> <span class="score-value">${score}</span>`;
 }
 
 //checks if the cards are in numerical order by comparing current card to previous card until all cards have been compared
@@ -191,11 +195,11 @@ function userWins(){
 
     //increases score by 1 if all 5 cards are in numerical order
     score++;
-    document.getElementById('score').innerHTML = `<span style="color: rgb(255, 120, 0);">Score:</span> <span style="color: white;">${score}</span>`;
+    document.querySelector('.score').innerHTML = `<span class="score-label">Score:</span> <span class="score-value">${score}</span>`;
     //sets high score equal to score if score is greater than high score
     if (score > highScore) {
         highScore = score;
-        document.getElementById('high-score').innerHTML = `<span style="color: #0088ff;">High Score:</span> <span style="color: white;">${highScore}</span>`;
+        document.getElementById('high-score').innerHTML = `<span class="high-score-label">High Score:</span> <span class="high-score-value">${highScore}</span>`;
     }
     
     // Animate winning cards in a wave
