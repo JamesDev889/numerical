@@ -178,7 +178,7 @@ button:hover {
 
 @keyframes wave {
     0%, 100% { transform: translateY(0px); }
-    25% { transform: translateY(-30px); }
+    25% { transform: translateY(-25px); }
     50% { transform: translateY(0px); }
-    75% { transform: translateY(-30px); }
+    75% { transform: translateY(-25px); }
 }
