@@ -206,7 +206,7 @@ function userWins(){
         slots.forEach(slot => slot.innerHTML = slot.id === 'freeSlot' ? 'Free' : slot.id.slice(-1));
         shuffleCards();
         drawCard();
-    }, 1600 + 5 * 200);
+    }, 1200 + 5 * 200);
 }
 
 function animateWinningCards() {
