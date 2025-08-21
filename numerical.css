@@ -136,6 +136,13 @@ button:hover {
     background-color: grey;
 }
 
+/* Disable hover effects on touch devices to prevent stuck states */
+@media (hover: none) and (pointer: coarse) {
+    button:hover {
+        background-color: white;
+    }
+}
+
 #endlessBtn.toggled {
     outline: 4px solid #0088ff;
     transition: none;
